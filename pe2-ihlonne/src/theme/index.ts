@@ -5,6 +5,14 @@ import {
 } from '@chakra-ui/react';
 
 const config = defineConfig({
+  globalCss: {
+    'html, body': {
+      margin: 0,
+      padding: 0,
+      bg: 'brand100',
+      color: 'brand900',
+    },
+  },
   theme: {
     breakpoints: {
       sm: '320px',
@@ -29,6 +37,7 @@ const config = defineConfig({
         brand600: { value: '#7e9da4' },
         brand700: { value: '#721825' },
         brand800: { value: '#120D1E' },
+        brand900: { value: '#0C0C0C' },
         active: { value: '#00FFB7' },
       },
     },
