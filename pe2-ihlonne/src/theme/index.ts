@@ -9,8 +9,10 @@ const config = defineConfig({
     'html, body': {
       margin: 0,
       padding: 0,
+      minW: '320px',
       bg: 'brand100',
       color: 'brand900',
+      minH: '100dvh',
     },
   },
   theme: {
@@ -51,6 +53,9 @@ const config = defineConfig({
         base: {
           borderRadius: 'sm',
           fontWeight: 'semibold',
+          rounded: 'sm',
+          bg: 'brand600',
+          p: '1rem 2rem',
         },
       },
     },
