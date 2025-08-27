@@ -6,18 +6,19 @@ import {
 
 /* import logo from '../assets/lightlogo.png'; */
 import logo from '../assets/darklogo.png';
+import { Link } from 'react-router';
 
 const Header = () => {
   return (
     <Box
+      as='header'
+      position='fixed'
       display='flex'
       justifyContent='space-between'
-      position='fixed'
-      w='full'
+      w='100%'
       h='auto'
-      top='0'
-      left='0'
-      p='2rem 8rem'
+      p='2rem 6rem'
+      zIndex='1000'
     >
       <Box>
         <Image src={logo} />
@@ -29,15 +30,19 @@ const Header = () => {
         gap='10'
       >
         <Box as='li' fontWeight='semibold'>
-          Browse Venues
+          <Link to='/Venues'> Browse Venues</Link>
         </Box>
         <Box as='li' fontWeight='semibold'>
-          List Your Venue
+          <Link to='/CreateVenues'>
+            List Your Venue
+          </Link>
         </Box>
         <Box
-          as='button'
           bg='brand700'
-          color='brand100'
+          color='white'
+          p='0.25rem 1.25rem'
+          rounded='md'
+          cursor='pointer'
         >
           Log In
         </Box>

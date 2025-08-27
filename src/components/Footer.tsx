@@ -10,7 +10,6 @@ import logo from '../assets/logoBig.png';
 const Footer = () => {
   return (
     <Flex
-      position='fixed'
       direction='column'
       justifyContent='center'
       alignItems='center'
@@ -85,6 +84,8 @@ const Footer = () => {
       <Separator
         my='4rem 2rem'
         color='brand300'
+        size='sm'
+        w='100%'
       />
       <Box>
         <Text>© ihlonne</Text>
