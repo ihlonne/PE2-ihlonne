@@ -4,7 +4,7 @@ export type Venue = {
   id: string;
   name: string;
   description?: string;
-  media?: Image[] | string[];
+  media?: Image[];
   price: number;
   maxGuests: number;
   rating?: number;
