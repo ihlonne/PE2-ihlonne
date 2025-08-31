@@ -6,13 +6,30 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-import hero from '../assets/heroImage.jpg';
+import type { Venue } from '../types/venue';
 
-const SmallVenueCard = () => {
+interface SmallVenueCardProps {
+  venue: Venue;
+}
+
+const SmallVenueCard = ({
+  venue,
+}: SmallVenueCardProps) => {
+  console.log(venue);
   return (
     <Flex direction='column' gap='1rem'>
       <Box position='relative'>
-        <Image src={hero} rounded='xl' />
+        <Image
+          src={
+            venue.media?.[0]?.url ??
+            'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg'
+          }
+          alt={
+            venue.media?.[0]?.alt ??
+            'Default venue image'
+          }
+          rounded='xl'
+        />
         <Text
           position='absolute'
           bg='white'
@@ -36,7 +53,7 @@ const SmallVenueCard = () => {
             rounded='sm'
             color='white'
           >
-            <Text>4,8</Text>
+            <Text>{venue.rating}</Text>
           </Box>
           <Flex gap='2' alignItems='center'>
             <Text fontWeight='semibold'>
@@ -51,13 +68,13 @@ const SmallVenueCard = () => {
             fontFamily='body'
             fontSize='lg'
           >
-            Urban leilighet sentralt i Bergen
+            {venue.name}
           </Heading>
-          <Text>Bergen, Norway</Text>
+          <Text>{venue.location?.address}</Text>
         </Box>
         <Flex justifyContent='space-between'>
-          <Text>369 NOK / night</Text>
-          <Text>4 guests</Text>
+          <Text>{venue.price} NOK / night</Text>
+          <Text>{venue.maxGuests} guests</Text>
         </Flex>
       </Flex>
     </Flex>
