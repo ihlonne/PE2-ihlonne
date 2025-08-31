@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Container,
   Flex,
   Grid,
   GridItem,
@@ -15,48 +14,59 @@ import {
 } from '@chakra-ui/react';
 
 import hero from '../assets/heroImage.jpg';
-import Search from '../components/Search';
 import SmallVenueCard from '../components/SmallVenueCard';
+import type { Venue } from '../types/venue';
+import { useEffect, useState } from 'react';
+import { getVenues } from '../lib/getVenues';
+import HeroSection from '../components/homePage/HeroSection';
 
 const Home = () => {
+  const [venues, setVenues] = useState<Venue[]>(
+    []
+  );
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] =
+    useState<unknown>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getVenues();
+        const processedVenues = res.data.filter(
+          (venue) =>
+            !venue.name
+              .toLowerCase()
+              .includes('test') &&
+            !venue.name
+              .toLowerCase()
+              .includes('zz') &&
+            !venue.name
+              .toLowerCase()
+              .includes('zxc')
+        );
+        setVenues(processedVenues);
+      } catch (e) {
+        if (!cancelled) setError(e);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  console.log(venues);
+
+  if (loading) return <div>Loading…</div>;
+  if (error)
+    return <div>Something went wrong</div>;
+
   return (
     <>
-      {/* Hero Section  */}
-      <Box
-        display='flex'
-        alignItems='center'
-        justifyContent='center'
-        position='relative'
-        backgroundImage={`url(${hero})`}
-        backgroundSize='cover'
-        backgroundPosition='center'
-        backgroundRepeat='no-repeat'
-        h='100vh'
-        w='100%'
-        _before={{
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          bg: 'blackAlpha.600',
-        }}
-      >
-        <Container
-          position='relative'
-          zIndex={1}
-          textAlign='center'
-          color='white'
-        >
-          <Heading
-            as='h1'
-            fontSize='5xl'
-            mb={6}
-            fontStyle='italic'
-          >
-            Where to next?
-          </Heading>
-          <Search />
-        </Container>
-      </Box>
+      <HeroSection />
       {/*  Favorites Section  */}
       <Flex
         direction='column'
@@ -122,10 +132,17 @@ const Home = () => {
             color='white'
             minChildWidth='300px'
           >
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
+            {venues && venues.length > 0
+              ? venues
+                  .slice(0, 4)
+                  .map((venue) => (
+                    <GridItem key={venue.id}>
+                      <SmallVenueCard
+                        venue={venue}
+                      />
+                    </GridItem>
+                  ))
+              : null}
           </SimpleGrid>
         </Box>
       </Flex>
@@ -154,14 +171,17 @@ const Home = () => {
             w='full'
             minChildWidth='300px'
           >
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
+            {venues && venues.length > 0
+              ? venues
+                  .slice(0, 8)
+                  .map((venue) => (
+                    <GridItem key={venue.id}>
+                      <SmallVenueCard
+                        venue={venue}
+                      />
+                    </GridItem>
+                  ))
+              : null}
           </SimpleGrid>
         </Box>
       </Flex>
@@ -319,10 +339,17 @@ const Home = () => {
             w='full'
             minChildWidth='300px'
           >
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
-            <SmallVenueCard />
+            {venues && venues.length > 0
+              ? venues
+                  .slice(0, 4)
+                  .map((venue) => (
+                    <GridItem key={venue.id}>
+                      <SmallVenueCard
+                        venue={venue}
+                      />
+                    </GridItem>
+                  ))
+              : null}
           </SimpleGrid>
         </Box>
       </Flex>
