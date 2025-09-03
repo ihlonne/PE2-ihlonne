@@ -3,7 +3,7 @@ import { getToken, onTokenChange } from './token';
 
 export const API_BASE =
   import.meta.env.VITE_API_BASE ??
-  'https://v2.api.noroff.dev/holidaze';
+  'https://v2.api.noroff.dev/';
 const API_KEY = import.meta.env.VITE_API_KEY as
   | string
   | undefined;
