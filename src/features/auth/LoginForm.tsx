@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   loginSchema,
   type LoginFormValues,
+  type LoginPayload,
 } from './schemas';
 import axios from 'axios';
 import { loginUser } from './api';
@@ -21,11 +22,6 @@ import {
   hasErrorArray,
   hasMessage,
 } from '../../lib/errorGuards';
-
-type LoginPayload = Omit<
-  LoginFormValues,
-  'confirmPassword'
->;
 
 type LoginFormProps = {
   onSuccess?: () => void;
