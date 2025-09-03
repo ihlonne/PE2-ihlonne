@@ -18,10 +18,13 @@ export const registerSchema = z
     confirmPassword: z
       .string()
       .min(8, 'Confirm your password'),
+    venueManager: z
+      .boolean()
+      .optional()
+      .default(false),
   })
   .refine(
-    (data) =>
-      data.password === data.confirmPassword,
+    (d) => d.password === d.confirmPassword,
     {
       path: ['confirmPassword'],
       message: 'Passwords must match',
@@ -55,10 +58,19 @@ export const loginSchema = z
     }
   );
 
-export type RegisterFormValues = z.infer<
+export type RegisterFormValues = z.input<
   typeof registerSchema
+>;
+
+export type RegisterPayload = Omit<
+  RegisterFormValues,
+  'confirmPassword'
 >;
 
 export type LoginFormValues = z.infer<
   typeof loginSchema
+>;
+export type LoginPayload = Omit<
+  LoginFormValues,
+  'confirmPassword'
 >;
