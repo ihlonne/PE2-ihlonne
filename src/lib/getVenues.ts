@@ -5,5 +5,7 @@ import { get } from './helpers';
 export const getVenues = async (): Promise<
   ApiListResponse<Venue>
 > => {
-  return get<ApiListResponse<Venue>>('/venues');
+  return get<ApiListResponse<Venue>>(
+    '/holidaze/venues'
+  );
 };

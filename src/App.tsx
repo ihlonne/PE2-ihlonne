@@ -5,6 +5,7 @@ import {
 } from 'react-router';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import { Toaster } from './components/ui/toaster';
 
 const App = function () {
   return (
@@ -16,6 +17,7 @@ const App = function () {
           </Routes>
         </Layout>
       </BrowserRouter>
+      <Toaster />
     </>
   );
 };
