@@ -6,18 +6,26 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-import type { Venue } from '../types/venue';
+import type { TVenue } from '../types/venue';
+import { useNavigate } from 'react-router';
 
 interface SmallVenueCardProps {
-  venue: Venue;
+  venue: TVenue;
 }
 
 const SmallVenueCard = ({
   venue,
 }: SmallVenueCardProps) => {
-  console.log(venue);
+  const navigate = useNavigate();
   return (
-    <Flex direction='column' gap='1rem'>
+    <Flex
+      direction='column'
+      gap='1rem'
+      onClick={() =>
+        navigate(`/venues/venue/${venue.id}`)
+      }
+      cursor='pointer'
+    >
       <Box position='relative'>
         <Image
           src={
