@@ -5,3 +5,8 @@ export type Booking = {
   guests: number;
   venueId: string;
 };
+
+export type BookingLike = {
+  dateFrom: string;
+  dateTo: string;
+};
