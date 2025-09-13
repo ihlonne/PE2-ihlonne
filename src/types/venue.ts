@@ -1,6 +1,7 @@
+import type { Booking } from './booking';
 import type { Image } from './common';
 
-export type Venue = {
+export type TVenue = {
   id: string;
   name: string;
   description?: string;
@@ -12,6 +13,8 @@ export type Venue = {
   updated: string;
   meta: Meta;
   location?: Location;
+  owner?: ProfileSummary;
+  bookings?: Booking[];
 };
 
 export type Meta = {
@@ -29,4 +32,18 @@ export type Location = {
   continent?: string;
   lat?: number;
   lng?: number;
+};
+
+export type ProfileSummary = {
+  name: string;
+  email: string;
+  bio?: string;
+  avatar?: {
+    url: string;
+    alt: string;
+  };
+  banner?: {
+    url: string;
+    alt: string;
+  };
 };

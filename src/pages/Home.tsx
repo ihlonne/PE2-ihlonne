@@ -15,13 +15,13 @@ import {
 
 import hero from '../assets/heroImage.jpg';
 import SmallVenueCard from '../components/SmallVenueCard';
-import type { Venue } from '../types/venue';
+import type { TVenue } from '../types/venue';
 import { useEffect, useState } from 'react';
-import { getVenues } from '../lib/getVenues';
 import HeroSection from '../components/homePage/HeroSection';
+import { getVenues } from '../lib/venue';
 
 const Home = () => {
-  const [venues, setVenues] = useState<Venue[]>(
+  const [venues, setVenues] = useState<TVenue[]>(
     []
   );
 

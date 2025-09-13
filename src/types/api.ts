@@ -1,9 +1,13 @@
 export type ApiListResponse<T> = {
   data: T[];
   meta: {
-    page: number;
-    pageSize: number;
+    currentPage: number;
     pageCount: number;
-    total: number;
+    totalCount: number;
+    limit: number;
+    isFirstPage: boolean;
+    isLastPage: boolean;
+    nextPage?: number;
+    previousPage?: number;
   };
 };
