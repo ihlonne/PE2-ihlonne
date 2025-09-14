@@ -78,7 +78,6 @@ const Venue = () => {
       maxW='1290px'
       w='100%'
       mx='auto'
-      mt='100px'
       mb='4rem'
       px={{ base: '4', xl: 0 }}
     >
