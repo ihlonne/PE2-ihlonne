@@ -8,13 +8,16 @@ import App from './App.tsx';
 import '@fontsource-variable/albert-sans/index.css';
 import '@fontsource/inria-serif/index.css';
 import { Provider } from './components/ui/provider.tsx';
+import { AuthProvider } from './context/AuthProvider.tsx';
 
 createRoot(
   document.getElementById('root')!
 ).render(
   <StrictMode>
     <Provider>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </Provider>
   </StrictMode>
 );
