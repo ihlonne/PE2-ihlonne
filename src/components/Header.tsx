@@ -99,7 +99,7 @@ const Header: React.FC = () => {
           gap='10'
         >
           <Box as='li' fontWeight='semibold'>
-            <Link to='/Venues'>
+            <Link to='/venues'>
               {' '}
               Browse Venues
             </Link>
