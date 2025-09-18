@@ -4,7 +4,12 @@ export type AuthUser = {
   avatar?: {
     url?: string;
     alt?: string;
-  } | null;
+  };
+  banner?: {
+    url?: string;
+    alt?: string;
+  };
+  venueManager: boolean;
 };
 
 export type AuthState = {
@@ -13,8 +18,12 @@ export type AuthState = {
 };
 
 export type AuthContextValue = {
-  user: AuthUser | null;
-  token: string | null;
+  user: AuthState['user'];
+  token: AuthState['token'];
   setAuth: (next: AuthState) => void;
+  saveUser: (u: AuthState['user'] | null) => void;
+  refreshUser: () => Promise<
+    AuthState['user'] | null
+  >;
   logout: () => void;
 };
