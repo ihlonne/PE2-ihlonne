@@ -29,7 +29,9 @@ type CalendarProps = {
     from: Date;
     to: Date;
     nights: number;
+    guests: number;
   }) => void;
+  canBook?: boolean;
 };
 
 const Calendar: React.FC<CalendarProps> = ({
@@ -39,6 +41,7 @@ const Calendar: React.FC<CalendarProps> = ({
   maxGuests,
   defaultMonth,
   onSelectRange,
+  canBook,
 }) => {
   const [range, setRange] = useState<
     DateRange | undefined
@@ -76,12 +79,19 @@ const Calendar: React.FC<CalendarProps> = ({
     guests >= 1 && guests <= maxGuests;
 
   const confirm = () => {
-    if (valid && range?.from && range.to)
+    if (
+      valid &&
+      validGuests &&
+      range?.from &&
+      range.to
+    ) {
       onSelectRange?.({
         from: range.from,
         to: range.to,
         nights,
+        guests,
       });
+    }
   };
 
   const styles = {
@@ -163,7 +173,9 @@ const Calendar: React.FC<CalendarProps> = ({
           </Button>
           <Button
             onClick={confirm}
-            disabled={!valid}
+            disabled={
+              !valid || !validGuests || !canBook
+            }
             bg='brand700'
             color='white'
             fontWeight='600'
@@ -172,6 +184,15 @@ const Calendar: React.FC<CalendarProps> = ({
           </Button>
         </Flex>
       </Flex>
+      {canBook === false && (
+        <Text
+          mt={2}
+          fontSize='sm'
+          color='fg.muted'
+        >
+          Log in to book this venue.
+        </Text>
+      )}
       {!validGuests && (
         <Text
           mt={2}
