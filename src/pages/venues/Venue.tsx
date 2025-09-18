@@ -18,8 +18,12 @@ import { IoLocationSharp } from 'react-icons/io5';
 import Calendar from '../../components/Calendar';
 import { toaster } from '../../components/ui/toaster';
 import { toUtcDate } from '../../lib/dates';
+import { useAuth } from '../../hooks/useAuth';
+import { createBooking } from '../../features/booking/api';
+import { isAxiosError } from 'axios';
 
 const Venue = () => {
+  const { user, token } = useAuth();
   const { id } = useParams<{ id: string }>();
   console.log(id);
   const [venue, setVenue] =
@@ -40,20 +44,70 @@ const Venue = () => {
     pets: 'Pets allowed',
   };
 
-  const handleRangeSelected = ({
+  const handleRangeSelected = async ({
+    from,
+    to,
     nights,
+    guests,
   }: {
     from: Date;
     to: Date;
     nights: number;
+    guests: number;
   }) => {
-    toaster.create({
-      title: 'Dates selected',
-      description: `${nights} night${
-        nights === 1 ? '' : 's'
-      } chosen`,
-      type: 'info',
-    });
+    if (!user) {
+      return;
+    }
+
+    const ok = window.confirm(
+      `Confirm booking?\n\nCheck-in: ${from.toDateString()}\nCheck-out: ${to.toDateString()}\nNights: ${nights}\nGuests: ${guests}`
+    );
+    if (!ok) return;
+
+    if (!venue) return;
+
+    if (!token) {
+      toaster.create({
+        title: 'Please log in',
+        description:
+          'You must be logged in to book.',
+        type: 'warning',
+      });
+      return;
+    }
+
+    try {
+      await createBooking(token, {
+        dateFrom: from.toISOString(),
+        dateTo: to.toISOString(),
+        guests,
+        venueId: venue?.id,
+      });
+
+      toaster.create({
+        title: 'Booking confirmed',
+        description: `${nights} night${
+          nights === 1 ? '' : 's'
+        } at ${venue?.name}`,
+        type: 'success',
+      });
+    } catch (err: unknown) {
+      console.error(err);
+
+      const message = isAxiosError(err)
+        ? (
+            err.response?.data as {
+              errors?: { message?: string }[];
+            }
+          )?.errors?.[0]?.message ?? err.message
+        : 'Please try again.';
+
+      toaster.create({
+        title: 'Booking failed',
+        description: message,
+        type: 'error',
+      });
+    }
   };
 
   useEffect(() => {
@@ -230,6 +284,7 @@ const Venue = () => {
                     )
                   : new Date()
               }
+              canBook={!!user}
               onSelectRange={handleRangeSelected}
             />
           </Flex>
