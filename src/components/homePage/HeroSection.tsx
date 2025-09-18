@@ -4,10 +4,13 @@ import {
   Heading,
 } from '@chakra-ui/react';
 
-import Search from '../Search';
+import Search from '../../features/search/Search';
 import hero from '../../assets/heroImage.jpg';
+import { useNavigate } from 'react-router';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <Box
       display='flex'
@@ -41,7 +44,18 @@ const HeroSection = () => {
         >
           Where to next?
         </Heading>
-        <Search />
+        <Search
+          defaultValue=''
+          onSubmit={(q) =>
+            navigate(
+              q
+                ? `/venues?q=${encodeURIComponent(
+                    q
+                  )}`
+                : `/venues`
+            )
+          }
+        />
       </Container>
     </Box>
   );
