@@ -1,6 +1,13 @@
 export type Profile = {
   name: string;
   email: string;
-  avatar?: string;
+  avatar?: {
+    url?: string;
+    alt?: string;
+  };
+  banner?: {
+    url: string;
+    alt?: string;
+  };
   venueManager: boolean;
 };
