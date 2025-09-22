@@ -22,6 +22,13 @@ export const createVenue = async (
   return res.data.data;
 };
 
+export const getVenue = async (id: string) => {
+  const res = await api.get<ApiEnvelope<TVenue>>(
+    `/holidaze/venues/${id}`
+  );
+  return res.data.data;
+};
+
 export const editVenue = async (
   id: string,
   payload: CreateVenuePayload,
