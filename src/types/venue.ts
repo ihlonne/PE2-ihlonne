@@ -47,3 +47,25 @@ export type ProfileSummary = {
     alt: string;
   };
 };
+
+export type CreateVenuePayload = {
+  name: string;
+  description: string;
+  price: number;
+  maxGuests: number;
+  meta?: {
+    wifi?: boolean;
+    parking?: boolean;
+    breakfast?: boolean;
+    pets?: boolean;
+  };
+  location?: {
+    address?: string;
+    city?: string;
+    zip?: string;
+    country?: string;
+  };
+  media?: { url: string; alt?: string }[];
+};
+
+export type VenueFormValues = CreateVenuePayload;
