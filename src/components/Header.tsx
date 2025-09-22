@@ -82,7 +82,7 @@ const Header: React.FC = () => {
       h='100px'
       py='2rem'
       px={{ base: '4', xl: 0 }}
-      zIndex='1000'
+      zIndex='3000'
     >
       <Flex
         justifyContent='space-between'
@@ -105,12 +105,13 @@ const Header: React.FC = () => {
             </Link>
           </Box>
           {!user ? (
-            <Box>
+            <Flex alignItems='center' gap='10'>
               <Box as='li' fontWeight='semibold'>
                 <Text
                   onClick={() =>
                     setRegisterOpen(true)
                   }
+                  cursor='pointer'
                 >
                   List Your Venue
                 </Text>
@@ -125,7 +126,7 @@ const Header: React.FC = () => {
               >
                 Log In
               </Box>
-            </Box>
+            </Flex>
           ) : (
             <Box>
               <AvatarGroup
