@@ -8,6 +8,7 @@ import {
 
 import type { TVenue } from '../types/venue';
 import { useNavigate } from 'react-router';
+import { IoLocationSharp } from 'react-icons/io5';
 
 interface SmallVenueCardProps {
   venue: TVenue;
@@ -26,63 +27,79 @@ const SmallVenueCard = ({
       }
       cursor='pointer'
     >
-      <Box position='relative'>
-        <Image
-          src={
-            venue.media?.[0]?.url ??
-            'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg'
-          }
-          alt={
-            venue.media?.[0]?.alt ??
-            'Default venue image'
-          }
-          rounded='xl'
-        />
-        <Text
-          position='absolute'
-          bg='white'
-          top='10px'
-          left='10px'
-          color='brand900'
-          fontSize='xs'
-          fontWeight='semibold'
-          p='0.25rem 0.5rem'
-          rounded='full'
-          zIndex='5'
+      <Flex
+        position='relative'
+        w='full'
+        overflow='hidden'
+      >
+        <Box
+          w='full'
+          aspectRatio='16/9'
+          maxH='205px'
         >
-          🤩 Guest Favourite
-        </Text>
-      </Box>
-      <Flex direction='column' gap='5'>
-        <Flex gap='2' alignItems='center'>
-          <Box
-            bg='brand700'
-            p='0.25rem'
-            rounded='sm'
-            color='white'
+          <Image
+            src={
+              venue.media?.[0]?.url ??
+              'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg'
+            }
+            alt={
+              venue.media?.[0]?.alt ??
+              'Default venue image'
+            }
+            w='full'
+            h='full'
+            objectFit='cover'
+            display='block'
+            rounded='xl'
+          />
+        </Box>
+
+        {(venue.rating ?? 0) >= 4.5 && (
+          <Text
+            position='absolute'
+            top='10px'
+            left='10px'
+            bg='white'
+            color='brand800'
+            rounded='full'
+            px='2'
+            py='1'
+            fontSize='xs'
+            fontWeight='semibold'
+            zIndex='5'
           >
-            <Text>{venue.rating}</Text>
-          </Box>
-          <Flex gap='2' alignItems='center'>
-            <Text fontWeight='semibold'>
-              Excellent
-            </Text>
-            <Text fontSize='xs'>(3 reviews)</Text>
-          </Flex>
-        </Flex>
-        <Box>
+            🤩 Guest Favourite
+          </Text>
+        )}
+      </Flex>
+      <Flex
+        direction='column'
+        justifyContent='space-between'
+        gap='5'
+      >
+        <Flex direction='column'>
           <Heading
             as='h3'
             fontFamily='body'
             fontSize='lg'
           >
-            {venue.name}
+            {venue.name.length >= 30
+              ? venue.name.slice(0, 30) + '...'
+              : venue.name}
           </Heading>
-          <Text>{venue.location?.address}</Text>
-        </Box>
-        <Flex justifyContent='space-between'>
-          <Text>{venue.price} NOK / night</Text>
-          <Text>{venue.maxGuests} guests</Text>
+          <Flex alignItems='center' gap='2'>
+            <IoLocationSharp />
+            <Text>
+              {venue.location?.city},{' '}
+              {venue.location?.country}
+            </Text>
+          </Flex>
+        </Flex>
+        <Flex direction='column'>
+          <Flex justifyContent='space-between'>
+            <Text>{venue.price} NOK / night</Text>
+            <Text>{venue.maxGuests} guests</Text>
+          </Flex>
         </Flex>
       </Flex>
     </Flex>
