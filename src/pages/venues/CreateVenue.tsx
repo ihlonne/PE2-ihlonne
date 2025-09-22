@@ -1,26 +1,35 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  Field,
-  FieldRequiredIndicator,
-  Heading,
-  HStack,
-  Input,
-  NumberInput,
-  Stack,
-  Textarea,
-  Wrap,
-  WrapItem,
-} from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
+import { useNavigate } from 'react-router';
+import { useAuth } from '../../hooks/useAuth';
+import { createVenue } from '../../features/venues/api';
+import { toaster } from '../../components/ui/toaster';
+import VenueForm from '../../features/venues/VenueForm';
+import type { CreateVenuePayload } from '../../types/venue';
 
-import { PiBowlFood } from 'react-icons/pi';
-import { FaCarSide } from 'react-icons/fa';
-import { MdPets } from 'react-icons/md';
-import { IoIosWifi } from 'react-icons/io';
-import { Link } from 'react-router';
+const blank: CreateVenuePayload = {
+  name: '',
+  description: '',
+  price: 0,
+  maxGuests: 1,
+  meta: {
+    wifi: false,
+    parking: false,
+    breakfast: false,
+    pets: false,
+  },
+  location: {
+    address: '',
+    city: '',
+    zip: '',
+    country: '',
+  },
+  media: [],
+};
 
 const CreateVenue = () => {
+  const { token } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <Box
       maxW='900px'
@@ -33,253 +42,41 @@ const CreateVenue = () => {
         Create Venue
       </Heading>
 
-      <form>
-        <Stack gap='4'>
-          <Heading
-            as='h2'
-            fontSize='md'
-            fontWeight='semibold'
-            fontFamily='body'
-          >
-            Basic Information
-          </Heading>
-          <Field.Root required>
-            <Field.Label>
-              Name <Field.RequiredIndicator />
-            </Field.Label>
-            <Input placeholder='Cozy Cabin in Voss ' />
-          </Field.Root>
-          <HStack>
-            <Field.Root required>
-              <Field.Label>
-                Price <Field.RequiredIndicator />
-              </Field.Label>
-              <NumberInput.Root
-                defaultValue='0'
-                w='full'
-              >
-                <NumberInput.Control />
-                <NumberInput.Input />
-              </NumberInput.Root>
-            </Field.Root>
-            <Field.Root required>
-              <Field.Label>
-                Guests <Field.RequiredIndicator />
-              </Field.Label>
-              <NumberInput.Root
-                defaultValue='0'
-                w='full'
-              >
-                <NumberInput.Control />
-                <NumberInput.Input />
-              </NumberInput.Root>
-            </Field.Root>
-          </HStack>
-          <Field.Root required>
-            <Field.Label>
-              Description{' '}
-              <FieldRequiredIndicator />{' '}
-            </Field.Label>
-            <Textarea placeholder='Describe your venue' />
-          </Field.Root>
-        </Stack>
-
-        <Stack my='2rem'>
-          <Heading
-            as='h2'
-            fontSize='md'
-            fontWeight='semibold'
-            fontFamily='body'
-          >
-            Facilities
-          </Heading>
-          <HStack spaceX='4'>
-            <Wrap>
-              <WrapItem>
-                <Checkbox.Root variant='solid'>
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
-                  <Checkbox.Label
-                    display='inline-flex'
-                    alignItems='center'
-                    gap='2'
-                  >
-                    <PiBowlFood /> Breakfast
-                  </Checkbox.Label>
-                </Checkbox.Root>
-              </WrapItem>
-              <WrapItem>
-                <Checkbox.Root variant='solid'>
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
-                  <Checkbox.Label
-                    display='inline-flex'
-                    alignItems='center'
-                    gap='2'
-                  >
-                    <FaCarSide /> Parking
-                  </Checkbox.Label>
-                </Checkbox.Root>
-              </WrapItem>
-              <WrapItem>
-                <Checkbox.Root variant='solid'>
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
-                  <Checkbox.Label
-                    display='inline-flex'
-                    alignItems='center'
-                    gap='2'
-                  >
-                    <MdPets /> Pet-Friendly
-                  </Checkbox.Label>
-                </Checkbox.Root>
-              </WrapItem>
-              <WrapItem>
-                <Checkbox.Root variant='solid'>
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
-                  <Checkbox.Label
-                    display='inline-flex'
-                    alignItems='center'
-                    gap='2'
-                  >
-                    <IoIosWifi /> Wi-Fi
-                  </Checkbox.Label>
-                </Checkbox.Root>
-              </WrapItem>
-            </Wrap>
-          </HStack>
-        </Stack>
-
-        <Stack>
-          <Heading
-            as='h2'
-            fontSize='md'
-            fontWeight='semibold'
-            fontFamily='body'
-          >
-            Location
-          </Heading>
-
-          <Field.Root>
-            <Field.Label>
-              Address <Field.RequiredIndicator />
-            </Field.Label>
-            <Input placeholder='Cozy Cabin in Voss ' />
-          </Field.Root>
-          <HStack>
-            <Field.Root>
-              <Field.Label>
-                Zip <Field.RequiredIndicator />
-              </Field.Label>
-              <NumberInput.Root
-                defaultValue='0'
-                w='full'
-              >
-                <NumberInput.Input />
-              </NumberInput.Root>
-            </Field.Root>
-            <Field.Root>
-              <Field.Label>
-                City
-                <Field.RequiredIndicator />
-              </Field.Label>
-              <Input placeholder='Voss' />
-            </Field.Root>
-            <Field.Root>
-              <Field.Label>
-                Country{' '}
-                <Field.RequiredIndicator />
-              </Field.Label>
-              <Input placeholder='Norway' />
-            </Field.Root>
-          </HStack>
-        </Stack>
-
-        <Stack my='2rem'>
-          <Heading
-            as='h2'
-            fontSize='md'
-            fontWeight='semibold'
-            fontFamily='body'
-          >
-            Media
-          </Heading>
-
-          <Stack>
-            <HStack>
-              <Field.Root>
-                <Field.Label>
-                  Paste Image URL
-                  <Field.RequiredIndicator />
-                </Field.Label>
-                <Input />
-              </Field.Root>
-              <Field.Root>
-                <Field.Label>
-                  Image Description
-                  <Field.RequiredIndicator />
-                </Field.Label>
-                <Input />
-              </Field.Root>
-            </HStack>
-            <Button
-              bg='brand700'
-              color='white'
-              rounded='md'
-            >
-              Add Media
-            </Button>
-            <Wrap mt='2rem'>
-              {/* Images will come here as they're uploaded, so will change Box to Image*/}
-              <Box
-                h='100px'
-                w='100px'
-                bg='brand300'
-                rounded='md'
-              />
-              <Box
-                h='100px'
-                w='100px'
-                bg='brand300'
-                rounded='md'
-              />
-              <Box
-                h='100px'
-                w='100px'
-                bg='brand300'
-                rounded='md'
-              />
-            </Wrap>
-          </Stack>
-        </Stack>
-
-        <HStack my='4rem'>
-          <Link to='/venues'>
-            <Button bg='brand300' rounded='md'>
-              Cancel
-            </Button>
-          </Link>
-          <Button
-            type='submit'
-            bg='brand700'
-            color='white'
-            rounded='md'
-          >
-            Create Venue
-          </Button>
-        </HStack>
-      </form>
+      <VenueForm
+        initialValues={blank}
+        submitLabel='Create venue'
+        onSubmit={async (values) => {
+          try {
+            const created = await createVenue(
+              values,
+              token!
+            ); // helper should unwrap .data
+            toaster.create({
+              title: 'Venue created',
+              description:
+                'Your venue is now live.',
+              type: 'success',
+              duration: 5000,
+            });
+            navigate(
+              `/venues/venue/${created.id}`
+            );
+          } catch (err: any) {
+            const msg =
+              err?.response?.data?.errors?.[0]
+                ?.message ||
+              err?.message ||
+              'Could not create venue';
+            toaster.create({
+              title: 'Something went wrong',
+              description: msg,
+              type: 'error',
+              duration: 6000,
+            });
+          }
+        }}
+      />
     </Box>
   );
 };
-
 export default CreateVenue;
