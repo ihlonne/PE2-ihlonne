@@ -51,7 +51,7 @@ export default function VenueForm({
 
   useEffect(() => {
     form.reset(initialValues);
-  }, [initialValues]);
+  }, [initialValues, form]);
 
   const {
     register,
