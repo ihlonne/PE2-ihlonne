@@ -1,4 +1,4 @@
-import type { Booking } from './booking';
+import type { Bookings } from './booking';
 import type { Image } from './common';
 
 export type TVenue = {
@@ -14,7 +14,10 @@ export type TVenue = {
   meta: Meta;
   location?: Location;
   owner?: ProfileSummary;
-  bookings?: Booking[];
+  bookings?: Bookings[];
+  _count?: {
+    bookings: number;
+  };
 };
 
 export type Meta = {
