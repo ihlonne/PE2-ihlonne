@@ -20,10 +20,13 @@ import { IoGrid } from 'react-icons/io5';
 import { FaListUl } from 'react-icons/fa6';
 import { FaPlus } from 'react-icons/fa6';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 const Venues = () => {
   const [isGridView, setIsGridView] =
     useState(true);
+
+  const navigate = useNavigate();
 
   return (
     <Flex
@@ -238,7 +241,12 @@ const Venues = () => {
                 {/* {items.length} */} results
               </Text>
             </Flex>
-            <Flex gap='2'>
+            <Flex
+              gap='2'
+              onClick={() =>
+                navigate('/venues/create')
+              }
+            >
               <Button bg='brand600' color='white'>
                 <FaPlus /> New Venue
               </Button>
