@@ -19,9 +19,12 @@ import {
 import type { Booking } from '../types/booking';
 import { toaster } from '../components/ui/toaster';
 import {
+  getVenuesForProfile,
   updateProfileMedia,
   updateVenueManager,
 } from '../features/profile/api';
+import { type TVenue } from '../types/venue';
+import YourVenuesCard from '../components/YourVenuesCard';
 
 const Profile = () => {
   const { user, token, refreshUser } = useAuth();
@@ -33,6 +36,11 @@ const Profile = () => {
   const [bookings, setBookings] = useState<
     Booking[]
   >([]);
+  const [venues, setVenues] = useState<TVenue[]>(
+    []
+  );
+  console.log(venues);
+
   const [loading, setLoading] = useState(false);
 
   const toast = toaster;
@@ -156,6 +164,27 @@ const Profile = () => {
       cancelled = true;
     };
   }, [token, user?.name]);
+
+  useEffect(() => {
+    if (!user?.name) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await getVenuesForProfile(
+          user.name
+        );
+        if (!cancelled) setVenues(data ?? []);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.name]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Cancel this booking?')) return;
@@ -336,10 +365,7 @@ const Profile = () => {
         >
           Your upcoming bookings
         </Heading>
-        <SimpleGrid
-          columns={{ base: 1, md: 2, lg: 3 }}
-          gap='2'
-        >
+        <SimpleGrid columns={1} gap='2'>
           {loading && (
             <Text>Loading bookings…</Text>
           )}
@@ -362,6 +388,42 @@ const Profile = () => {
           )}
         </SimpleGrid>
       </Flex>
+      {vm === true ? (
+        <Flex direction='column' gap='2rem'>
+          <Heading
+            as='h1'
+            fontSize='2xl'
+            fontFamily='body'
+          >
+            Your venues
+          </Heading>
+          <SimpleGrid
+            columns={{ base: 1, md: 2, lg: 3 }}
+            gap='2'
+          >
+            {loading && (
+              <Text>Loading Venues…</Text>
+            )}
+            {!loading && venues.length === 0 && (
+              <Text>No upcoming venues.</Text>
+            )}
+            {venues.length > 0 ? (
+              venues.map((venue) => (
+                <GridItem key={venue.id}>
+                  <YourVenuesCard
+                    venue={venue}
+                    onCancel={() =>
+                      handleDelete(venue.id)
+                    }
+                  />
+                </GridItem>
+              ))
+            ) : (
+              <Text>No Venues</Text>
+            )}
+          </SimpleGrid>
+        </Flex>
+      ) : null}
     </Flex>
   );
 };
