@@ -1,4 +1,5 @@
 import { api } from '../../lib';
+import type { TVenue } from '../../types/venue';
 
 export const updateProfileMedia = async (
   token: string | null,
@@ -39,4 +40,14 @@ export const updateVenueManager = async (
       },
     }
   );
+};
+
+export const getVenuesForProfile = async (
+  username: string
+): Promise<TVenue[]> => {
+  const res = await api.get<{ data: TVenue[] }>(
+    `/holidaze/profiles/${username}/venues`,
+    { params: { _bookings: true, _owner: true } }
+  );
+  return res.data.data;
 };
