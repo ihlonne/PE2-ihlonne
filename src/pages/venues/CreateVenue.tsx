@@ -1,10 +1,11 @@
 import { Box, Heading } from '@chakra-ui/react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { createVenue } from '../../features/venues/api';
 import { toaster } from '../../components/ui/toaster';
 import VenueForm from '../../features/venues/VenueForm';
 import type { CreateVenuePayload } from '../../types/venue';
+import { isAxiosError } from 'axios';
 
 const blank: CreateVenuePayload = {
   name: '',
@@ -50,7 +51,7 @@ const CreateVenue = () => {
             const created = await createVenue(
               values,
               token!
-            ); // helper should unwrap .data
+            );
             toaster.create({
               title: 'Venue created',
               description:
@@ -61,15 +62,18 @@ const CreateVenue = () => {
             navigate(
               `/venues/venue/${created.id}`
             );
-          } catch (err: any) {
-            const msg =
-              err?.response?.data?.errors?.[0]
-                ?.message ||
-              err?.message ||
-              'Could not create venue';
+          } catch (err: unknown) {
+            const msg = isAxiosError(err)
+              ? err.response?.data?.errors?.[0]
+                  ?.message ?? err.message
+              : err instanceof Error
+              ? err.message
+              : 'Could not create venue';
+
             toaster.create({
               title: 'Something went wrong',
-              description: msg,
+              description:
+                msg ?? 'Could not create venue',
               type: 'error',
               duration: 6000,
             });
