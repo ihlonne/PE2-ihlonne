@@ -45,3 +45,10 @@ export const editVenue = async (
   );
   return res.data.data;
 };
+
+export const deleteVenue = async (id: string) => {
+  const res = await api.delete<
+    ApiEnvelope<TVenue>
+  >(`/holidaze/venues/${id}`);
+  return res.data.data;
+};
