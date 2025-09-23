@@ -8,9 +8,12 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { IoLocationSharp } from 'react-icons/io5';
-import type { Booking } from '../types/booking';
+import type { Booking } from '../../types/booking';
 import { useNavigate } from 'react-router';
-import { formatDate } from '../utils/dates';
+import { formatDate } from '../../utils/dates';
+import CustomModal from '../../components/CustomModal';
+import ConfirmCancelBooking from './ConfirmCancelBooking';
+import { useState } from 'react';
 
 interface CustomerBookingCardProps {
   booking: Booking;
@@ -22,7 +25,12 @@ const CustomerBookingCard = ({
   onCancel,
 }: CustomerBookingCardProps) => {
   const navigate = useNavigate();
-  console.log(booking);
+
+  const [
+    confirmCancelOpen,
+    setConfirmCancelOpen,
+  ] = useState(false);
+
   return (
     <Flex
       direction={{ base: 'column', lg: 'row' }}
@@ -121,11 +129,30 @@ const CustomerBookingCard = ({
           </Button>
           <Button
             bg='brand300'
-            onClick={onCancel}
+            onClick={() =>
+              setConfirmCancelOpen(true)
+            }
           >
             Cancel Booking
           </Button>
         </Flex>
+        <CustomModal
+          open={confirmCancelOpen}
+          onClose={() =>
+            setConfirmCancelOpen(false)
+          }
+          title='Are you sure you want to cancel this venue?'
+        >
+          <ConfirmCancelBooking
+            onCancel={() =>
+              setConfirmCancelOpen(false)
+            }
+            onConfirm={() => {
+              onCancel();
+              setConfirmCancelOpen(false);
+            }}
+          />
+        </CustomModal>
       </Flex>
     </Flex>
   );
