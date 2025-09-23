@@ -34,7 +34,7 @@ const App = function () {
               element={<CreateVenue />}
             />
             <Route
-              path='/venues/edit'
+              path='/venues/edit/:id'
               element={<EditVenue />}
             />
             <Route
