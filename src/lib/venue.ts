@@ -3,7 +3,8 @@ import type { TVenue } from '../types/venue';
 import api from './api';
 
 export const getVenues = async (opts?: {
-  perPage?: number;
+  page?: number;
+  limit?: number;
   includeOwner?: boolean;
   includeBookings?: boolean;
   sort?:
@@ -14,46 +15,28 @@ export const getVenues = async (opts?: {
   sortOrder?: 'asc' | 'desc';
 }): Promise<ApiListResponse<TVenue>> => {
   const {
-    perPage = 100,
+    page = 1,
+    limit = 24,
     includeOwner = true,
-    includeBookings = true,
+    includeBookings = false,
     sort = 'created',
     sortOrder = 'desc',
   } = opts ?? {};
 
-  let page = 1;
-  let isLastPage = false;
-
-  const all: TVenue[] = [];
-  let lastMeta:
-    | ApiListResponse<TVenue>['meta']
-    | undefined;
-
-  while (!isLastPage) {
-    const { data } = await api.get<
-      ApiListResponse<TVenue>
-    >('/holidaze/venues', {
+  const { data } = await api.get(
+    '/holidaze/venues',
+    {
       params: {
         page,
-        limit: perPage,
+        limit,
         sort,
         sortOrder,
         _owner: includeOwner,
         _bookings: includeBookings,
       },
-    });
-
-    if (data?.data?.length)
-      all.push(...data.data);
-    lastMeta = data.meta;
-    isLastPage = Boolean(data.meta?.isLastPage);
-    page += 1;
-  }
-
-  return {
-    data: all,
-    meta: lastMeta as ApiListResponse<TVenue>['meta'],
-  };
+    }
+  );
+  return data; // { data: TVenue[], meta }
 };
 
 export const getVenue = async (
