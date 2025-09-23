@@ -10,7 +10,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAuth } from '../hooks/useAuth';
-import CustomerBookingCard from '../components/CustomerBookingCard';
+import CustomerBookingCard from '../features/profile/CustomerBookingCard';
 import { useEffect, useState } from 'react';
 import {
   deleteBooking,
@@ -24,7 +24,8 @@ import {
   updateVenueManager,
 } from '../features/profile/api';
 import { type TVenue } from '../types/venue';
-import YourVenuesCard from '../components/YourVenuesCard';
+import YourVenuesCard from '../features/profile/YourVenuesCard';
+import { deleteVenue } from '../features/venues/api';
 
 const Profile = () => {
   const { user, token, refreshUser } = useAuth();
@@ -39,7 +40,6 @@ const Profile = () => {
   const [venues, setVenues] = useState<TVenue[]>(
     []
   );
-  console.log(venues);
 
   const [loading, setLoading] = useState(false);
 
@@ -165,18 +165,29 @@ const Profile = () => {
     };
   }, [token, user?.name]);
 
+  const loadMyVenues = async () => {
+    if (!user?.name) return;
+    setLoading(true);
+    try {
+      const data = await getVenuesForProfile(
+        user.name
+      );
+      setVenues(data ?? []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user?.name) return;
     let cancelled = false;
     (async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const data = await getVenuesForProfile(
           user.name
         );
         if (!cancelled) setVenues(data ?? []);
-      } catch (e) {
-        console.error(e);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -186,9 +197,9 @@ const Profile = () => {
     };
   }, [user?.name]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Cancel this booking?')) return;
-
+  const handleCancelBooking = async (
+    id: string
+  ) => {
     const previous = bookings;
     setBookings((prev) =>
       prev.filter((b) => b.id !== id)
@@ -198,13 +209,38 @@ const Profile = () => {
       await deleteBooking(token, id);
       toast.create({
         title: 'Booking cancelled',
-        type: 'Success',
+        type: 'success',
       });
     } catch (e) {
       console.error(e);
       setBookings(previous);
       toast.create({
         title: 'Could not cancel booking',
+        type: 'error',
+      });
+    }
+  };
+
+  const handleDeleteVenue = async (
+    id: string
+  ) => {
+    const prev = venues;
+    setVenues((vs) =>
+      vs.filter((v) => v.id !== id)
+    );
+
+    try {
+      await deleteVenue(id);
+      await loadMyVenues();
+      toaster.create({
+        title: 'Venue deleted',
+        type: 'success',
+      });
+    } catch (e) {
+      console.error(e);
+      setVenues(prev);
+      toaster.create({
+        title: 'Could not delete venue',
         type: 'error',
       });
     }
@@ -345,7 +381,6 @@ const Profile = () => {
                 disabled={vmSaving}
               >
                 <Switch.HiddenInput />
-
                 <Switch.Label>
                   Venue manager
                 </Switch.Label>
@@ -357,6 +392,7 @@ const Profile = () => {
           </Flex>
         </Flex>
       </Flex>
+
       <Flex direction='column' gap='2rem'>
         <Heading
           as='h1'
@@ -378,7 +414,9 @@ const Profile = () => {
                 <CustomerBookingCard
                   booking={booking}
                   onCancel={() =>
-                    handleDelete(booking.id)
+                    handleCancelBooking(
+                      booking.id
+                    )
                   }
                 />
               </GridItem>
@@ -388,6 +426,7 @@ const Profile = () => {
           )}
         </SimpleGrid>
       </Flex>
+
       {vm === true ? (
         <Flex direction='column' gap='2rem'>
           <Heading
@@ -413,7 +452,7 @@ const Profile = () => {
                   <YourVenuesCard
                     venue={venue}
                     onCancel={() =>
-                      handleDelete(venue.id)
+                      handleDeleteVenue(venue.id)
                     }
                   />
                 </GridItem>

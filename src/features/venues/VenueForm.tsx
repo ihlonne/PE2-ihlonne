@@ -24,7 +24,7 @@ import { PiBowlFood } from 'react-icons/pi';
 import { FaCarSide } from 'react-icons/fa';
 import { MdPets } from 'react-icons/md';
 import { IoIosWifi } from 'react-icons/io';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 export type VenueFormValues = CreateVenuePayload;
 

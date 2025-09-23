@@ -1,3 +1,4 @@
+// pages/venues/Venue.tsx
 import {
   Avatar,
   AvatarGroup,
@@ -11,38 +12,63 @@ import {
   WrapItem,
 } from '@chakra-ui/react';
 import { useParams } from 'react-router';
-import { getVenue } from '../../lib/venue';
 import { useEffect, useState } from 'react';
-import type { TVenue } from '../../types/venue';
 import { IoLocationSharp } from 'react-icons/io5';
+import { isAxiosError } from 'axios';
+
 import Calendar from '../../components/Calendar';
 import { toaster } from '../../components/ui/toaster';
+import { getVenue } from '../../lib/venue';
 import { toUtcDate } from '../../lib/dates';
 import { useAuth } from '../../hooks/useAuth';
 import { createBooking } from '../../features/booking/api';
-import { isAxiosError } from 'axios';
+import type { TVenue } from '../../types/venue';
 
-const Venue = () => {
-  const { user, token } = useAuth();
-  const { id } = useParams<{ id: string }>();
-  console.log(id);
-  const [venue, setVenue] =
-    useState<TVenue | null>(null);
-  console.log(venue);
-
-  type AmenityKey = keyof TVenue['meta'];
-  const ORDER: AmenityKey[] = [
-    'wifi',
-    'parking',
-    'breakfast',
-    'pets',
-  ];
-  const LABELS: Record<AmenityKey, string> = {
+type AmenityKey = keyof TVenue['meta'];
+const AMENITY_ORDER: AmenityKey[] = [
+  'wifi',
+  'parking',
+  'breakfast',
+  'pets',
+];
+const AMENITY_LABELS: Record<AmenityKey, string> =
+  {
     wifi: 'Wi-Fi',
     parking: 'Parking',
     breakfast: 'Breakfast',
     pets: 'Pets allowed',
   };
+
+const FALLBACK_IMAGE =
+  'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg';
+
+const Venue = () => {
+  const { user, token } = useAuth();
+  const { id } = useParams<{ id: string }>();
+
+  const [venue, setVenue] =
+    useState<TVenue | null>(null);
+  const [heroIdx, setHeroIdx] = useState(0);
+
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      try {
+        const data = await getVenue(id);
+        setVenue(data);
+      } catch (err) {
+        console.error(err);
+        toaster.create({
+          title: 'Could not load venue',
+          type: 'error',
+        });
+      }
+    })();
+  }, [id]);
+
+  useEffect(() => {
+    setHeroIdx(0);
+  }, [venue?.id]);
 
   const handleRangeSelected = async ({
     from,
@@ -55,16 +81,12 @@ const Venue = () => {
     nights: number;
     guests: number;
   }) => {
-    if (!user) {
-      return;
-    }
+    if (!user) return;
 
     const ok = window.confirm(
       `Confirm booking?\n\nCheck-in: ${from.toDateString()}\nCheck-out: ${to.toDateString()}\nNights: ${nights}\nGuests: ${guests}`
     );
-    if (!ok) return;
-
-    if (!venue) return;
+    if (!ok || !venue) return;
 
     if (!token) {
       toaster.create({
@@ -81,19 +103,17 @@ const Venue = () => {
         dateFrom: from.toISOString(),
         dateTo: to.toISOString(),
         guests,
-        venueId: venue?.id,
+        venueId: venue.id,
       });
 
       toaster.create({
         title: 'Booking confirmed',
         description: `${nights} night${
           nights === 1 ? '' : 's'
-        } at ${venue?.name}`,
+        } at ${venue.name}`,
         type: 'success',
       });
     } catch (err: unknown) {
-      console.error(err);
-
       const message = isAxiosError(err)
         ? (
             err.response?.data as {
@@ -101,7 +121,6 @@ const Venue = () => {
             }
           )?.errors?.[0]?.message ?? err.message
         : 'Please try again.';
-
       toaster.create({
         title: 'Booking failed',
         description: message,
@@ -110,20 +129,16 @@ const Venue = () => {
     }
   };
 
-  useEffect(() => {
-    if (!id) return;
-    (async () => {
-      try {
-        const data = await getVenue(id);
-        console.log(data);
-        setVenue(data);
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, [id]);
-
+  // Wait for venue before rendering/deriving
   if (!venue) return null;
+
+  const images = (venue.media ?? []).filter(
+    (m) => m?.url
+  );
+  const hero = images[heroIdx] ?? {
+    url: FALLBACK_IMAGE,
+    alt: venue.name,
+  };
 
   return (
     <Flex
@@ -135,41 +150,79 @@ const Venue = () => {
       mb='4rem'
       px={{ base: '4', xl: 0 }}
     >
-      <Box>
+      <Flex direction='column' gap='2'>
         <Box w='full'>
           <Image
-            src={
-              venue?.media?.[0]?.url ||
-              'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg'
-            }
+            src={hero.url}
             alt={
-              venue?.media?.[0]?.alt ||
-              venue?.name
+              hero.alt || `${venue.name} photo`
             }
             maxW='1290px'
             w='100%'
-            maxH='400px'
+            maxH='450px'
             objectFit='cover'
             rounded='sm'
           />
         </Box>
-        <Heading
-          as='h1'
-          fontSize='3xl'
-          fontFamily='body'
-          my='6'
-        >
-          {venue?.name}
-        </Heading>
-      </Box>
+
+        {images.length > 1 && (
+          <Wrap>
+            <Flex
+              direction={{
+                base: 'column',
+                lg: 'row',
+              }}
+              gap='2'
+            >
+              {images.map((m, i) =>
+                i === heroIdx ? null : (
+                  <WrapItem key={m.url || i}>
+                    <Box
+                      position='relative'
+                      h='120px'
+                      maxW='210px'
+                      w='100%'
+                      onClick={() =>
+                        setHeroIdx(i)
+                      }
+                      cursor='pointer'
+                      role='button'
+                      aria-label={`Show image ${
+                        i + 1
+                      }`}
+                    >
+                      <Image
+                        src={m.url}
+                        alt={m.alt || ''}
+                        h='full'
+                        w='full'
+                        objectFit='cover'
+                        rounded='md'
+                      />
+                    </Box>
+                  </WrapItem>
+                )
+              )}
+            </Flex>
+          </Wrap>
+        )}
+      </Flex>
+
+      <Heading
+        as='h1'
+        fontSize='3xl'
+        fontFamily='body'
+        my='6'
+      >
+        {venue.name}
+      </Heading>
+
       <Flex
-        direction={{
-          base: 'column',
-          md: 'row',
-        }}
+        direction={{ base: 'column', md: 'row' }}
         gap='4rem'
         mt='2rem'
       >
+        {/* Owner */}
         <Flex
           alignItems='flex-start'
           gap='2'
@@ -179,7 +232,7 @@ const Venue = () => {
             <Avatar.Root size='2xl'>
               <Avatar.Fallback />
               <Avatar.Image
-                src={venue?.owner?.avatar?.url}
+                src={venue.owner?.avatar?.url}
               />
             </Avatar.Root>
           </AvatarGroup>
@@ -193,9 +246,11 @@ const Venue = () => {
             >
               Venue Manager
             </Text>
-            <Text>{venue?.owner?.name}</Text>
+            <Text>{venue.owner?.name}</Text>
           </Flex>
         </Flex>
+
+        {/* Details */}
         <Flex
           direction='column'
           gap='2'
@@ -209,55 +264,55 @@ const Venue = () => {
           >
             Description
           </Heading>
+
           <Flex alignItems='center' gap='2'>
             <IoLocationSharp />
-            <Text>
-              {venue?.location?.address}
-            </Text>
+            <Text>{venue.location?.address}</Text>
           </Flex>
-          <Text>{venue?.description}</Text>
+
+          <Text>{venue.description}</Text>
 
           <Text
             my='4'
             fontSize='xl'
             fontWeight='600'
           >
-            {venue?.price} NOK / night
+            {venue.price} NOK / night
           </Text>
 
-          {venue && (
-            <Wrap mt='4' gap='2'>
-              {ORDER.filter(
-                (k) => venue?.meta?.[k]
-              ).map((k) => (
-                <WrapItem key={k}>
+          <Wrap mt='4' gap='2'>
+            {AMENITY_ORDER.filter(
+              (k) => venue.meta?.[k]
+            ).map((k) => (
+              <WrapItem key={k}>
+                <Tag.Root
+                  size='lg'
+                  variant='subtle'
+                >
+                  <Tag.Label>
+                    {AMENITY_LABELS[k]}
+                  </Tag.Label>
+                </Tag.Root>
+              </WrapItem>
+            ))}
+
+            {typeof venue.maxGuests ===
+              'number' &&
+              venue.maxGuests > 0 && (
+                <WrapItem>
                   <Tag.Root
                     size='lg'
                     variant='subtle'
                   >
                     <Tag.Label>
-                      {LABELS[k]}
+                      Max: {venue.maxGuests}{' '}
+                      guests
                     </Tag.Label>
                   </Tag.Root>
                 </WrapItem>
-              ))}
-              {typeof venue.maxGuests ===
-                'number' &&
-                venue.maxGuests > 0 && (
-                  <WrapItem>
-                    <Tag.Root
-                      size='lg'
-                      variant='subtle'
-                    >
-                      <Tag.Label>
-                        Max: {venue.maxGuests}{' '}
-                        guests
-                      </Tag.Label>
-                    </Tag.Root>
-                  </WrapItem>
-                )}
-            </Wrap>
-          )}
+              )}
+          </Wrap>
+
           <Flex
             direction='column'
             mt='4rem'
@@ -293,4 +348,5 @@ const Venue = () => {
     </Flex>
   );
 };
+
 export default Venue;

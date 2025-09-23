@@ -5,15 +5,16 @@ import {
   Heading,
   Image,
 } from '@chakra-ui/react';
-import type { TVenue } from '../types/venue';
-import { useNavigate } from 'react-router';
-import CustomModal from './CustomModal';
-import ViewBookingsOnVenue from '../features/profile/ViewBookingsOnVenue';
+import type { TVenue } from '../../types/venue';
+import { useNavigate } from 'react-router-dom'; // ✅ use react-router-dom
+import CustomModal from '../../components/CustomModal';
+import ViewBookingsOnVenue from '../../features/profile/ViewBookingsOnVenue';
 import { useState } from 'react';
+import ConfirmDeleteVenue from './ConfirmDeleteVenue';
 
 interface YourVenuesCardsProp {
   venue: TVenue;
-  onCancel: () => void;
+  onCancel: () => void; // parent handler (deletes + soft refresh)
 }
 
 const YourVenuesCard = ({
@@ -26,7 +27,11 @@ const YourVenuesCard = ({
     venuesBookingsOpen,
     setVenuesBookingsOpen,
   ] = useState(false);
-  console.log(venue);
+  const [
+    confirmDeleteOpen,
+    setConfirmDeleteOpen,
+  ] = useState(false);
+
   return (
     <Flex
       direction='column'
@@ -48,8 +53,10 @@ const YourVenuesCard = ({
           }
           w='100%'
           h='100%'
+          objectFit='cover'
         />
       </Box>
+
       <Flex
         direction='column'
         justifyContent='space-between'
@@ -90,12 +97,15 @@ const YourVenuesCard = ({
               color='white'
               fontWeight='semibold'
               onClick={() =>
-                navigate(`/venues/edit`)
+                navigate(
+                  `/venues/edit/${venue.id}`
+                )
               }
             >
               Edit Venue
             </Button>
           </Flex>
+
           <Button
             bg='brand300'
             onClick={() =>
@@ -105,13 +115,19 @@ const YourVenuesCard = ({
             View Bookings (
             {venue._count?.bookings})
           </Button>
+
           <Button
             bg='brand300'
-            onClick={onCancel}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation(); // 🔒 avoid any parent/card navigation
+              setConfirmDeleteOpen(true);
+            }}
           >
             Delete Venue
           </Button>
         </Flex>
+
         <CustomModal
           open={venuesBookingsOpen}
           onClose={() =>
@@ -121,6 +137,24 @@ const YourVenuesCard = ({
         >
           <ViewBookingsOnVenue
             bookings={venue.bookings ?? []}
+          />
+        </CustomModal>
+
+        <CustomModal
+          open={confirmDeleteOpen}
+          onClose={() =>
+            setConfirmDeleteOpen(false)
+          }
+          title='Are you sure you want to delete this venue?'
+        >
+          <ConfirmDeleteVenue
+            onCancel={() =>
+              setConfirmDeleteOpen(false)
+            }
+            onConfirm={() => {
+              onCancel();
+              setConfirmDeleteOpen(false);
+            }}
           />
         </CustomModal>
       </Flex>
