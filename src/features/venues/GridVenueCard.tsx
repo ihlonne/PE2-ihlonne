@@ -3,69 +3,81 @@ import {
   Button,
   Flex,
   Heading,
-  HStack,
   Image,
   Span,
   Text,
 } from '@chakra-ui/react';
 
-import { FaStar } from 'react-icons/fa';
 import { FaAngleRight } from 'react-icons/fa6';
+import type { TVenue } from '../../types/venue';
 import { useNavigate } from 'react-router';
-import type { TVenue } from '../types/venue';
 
-type ListVenueCardProps = { venue: TVenue };
+type VenueProps = {
+  venue: TVenue;
+};
 
-const ListVenueCard = ({
-  venue,
-}: ListVenueCardProps) => {
+const GridVenueCard = ({ venue }: VenueProps) => {
   const navigate = useNavigate();
+
   return (
     <Flex
       gap='4'
-      direction={{ base: 'column', md: 'row' }}
+      direction='column'
+      maxW='310px'
+      w='full'
       onClick={() =>
         navigate(`/venues/venue/${venue.id}`)
       }
+      cursor='pointer'
     >
-      <Image
-        src={
-          venue.media?.[0]?.url ??
-          'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg'
-        }
-        alt={
-          venue.media?.[0]?.alt ??
-          'Default venue image'
-        }
-        maxW='300px'
+      <Box
         w='full'
-        h='245px'
-        rounded='md'
-      />
+        aspectRatio='16/9'
+        overflow='hidden'
+      >
+        <Image
+          src={
+            venue.media?.[0]?.url ??
+            'https://images.pexels.com/photos/28216688/pexels-photo-28216688.png'
+          }
+          alt={
+            venue.media?.[0]?.alt ??
+            'Default venue image'
+          }
+          w='full'
+          h='full'
+          objectFit='cover'
+          loading='lazy'
+          decoding='async'
+          rounded='md'
+        />
+      </Box>
       <Flex
         direction='column'
         justifyContent='space-between'
         w='full'
+        h='200px'
       >
-        <Flex justifyContent='space-between'>
+        <Flex
+          direction='column'
+          justifyContent='space-between'
+        >
           <Box>
             <Heading as='h2' fontFamily='body'>
               {venue.name}
             </Heading>
             <Text fontSize='xs'>
-              {venue.location?.address}
+              {venue.location?.city},{' '}
+              {venue.location?.country}
             </Text>
           </Box>
-          <Box>
-            <HStack>
-              {[...Array(5)].map((_, i) => (
-                <FaStar key={i} />
-              ))}
-            </HStack>
-          </Box>
         </Flex>
-        <Text fontSize='s'>
-          {venue.description?.slice(0, 80)}
+        <Text fontSize='s' my='4'>
+          {venue.description &&
+          venue.description.length > 80
+            ? venue.description?.slice(0, 80) +
+              '...'
+            : venue.description}
         </Text>
         <Flex direction='column'>
           <Text>{venue.maxGuests} guests</Text>
@@ -89,4 +101,4 @@ const ListVenueCard = ({
   );
 };
 
-export default ListVenueCard;
+export default GridVenueCard;

@@ -62,6 +62,10 @@ const Search: React.FC<SearchProps> = ({
               color: 'blackAlpha.600',
             }}
             border='none'
+            value={query}
+            onChange={(e) =>
+              setQuery(e.target.value)
+            }
           />
         </Stack>
 

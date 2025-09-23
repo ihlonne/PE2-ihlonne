@@ -40,7 +40,7 @@ const SmallVenueCard = ({
           <Image
             src={
               venue.media?.[0]?.url ??
-              'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg'
+              'https://images.pexels.com/photos/28216688/pexels-photo-28216688.png'
             }
             alt={
               venue.media?.[0]?.alt ??

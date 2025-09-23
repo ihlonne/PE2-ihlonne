@@ -4,6 +4,7 @@ import {
   Checkbox,
   Flex,
   Grid,
+  GridItem,
   Heading,
   HStack,
   Icon,
@@ -19,14 +20,65 @@ import { FaStar } from 'react-icons/fa';
 import { IoGrid } from 'react-icons/io5';
 import { FaListUl } from 'react-icons/fa6';
 import { FaPlus } from 'react-icons/fa6';
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import {
+  useNavigate,
+  useSearchParams,
+} from 'react-router';
+import type { TVenue } from '../../types/venue';
+import searchVenues from '../../features/search/api';
+import { getVenues } from '../../lib/venue';
+import Search from '../../features/search/Search';
+import GridVenueCard from '../../features/venues/GridVenueCard';
+import ListVenueCard from '../../features/venues/ListVenueCard';
 
 const Venues = () => {
   const [isGridView, setIsGridView] =
     useState(true);
 
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+  const q = searchParams.get('q') ?? '';
+  const [page, setPage] = useState(1);
+  const [isLast, setIsLast] = useState(false);
+  const [venues, setVenues] = useState<TVenue[]>(
+    []
+  );
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+
+    (async () => {
+      const res = q
+        ? await searchVenues(q, {
+            page,
+            limit: 12,
+          }) // 🔎
+        : await getVenues({
+            page,
+            limit: 12,
+          }); // 📄
+
+      if (!alive) return;
+
+      setVenues((prev) =>
+        page === 1
+          ? res.data
+          : [...prev, ...res.data]
+      );
+      setIsLast(Boolean(res.meta?.isLastPage));
+    })().finally(
+      () => alive && setLoading(false)
+    );
+
+    return () => {
+      alive = false;
+    };
+  }, [q, page]);
 
   return (
     <Flex
@@ -37,12 +89,19 @@ const Venues = () => {
       minH='100dvh'
     >
       <Heading as='h1'>Browse Venues</Heading>
-      {/* <Search
+      <Search
         defaultValue={q}
-        onSubmit={(val) =>
-          setParams(val ? { q: val } : {})
-        }
-      /> */}
+        onSubmit={(val) => {
+          const next = new URLSearchParams(
+            searchParams
+          );
+          if (val) next.set('q', val);
+          else next.delete('q');
+          setSearchParams(next, {
+            replace: false,
+          });
+        }}
+      />
       <Flex mt='4rem' gap='4rem' w='full'>
         {/* Filters */}
         <Flex direction='column' gap='2rem'>
@@ -237,9 +296,7 @@ const Venues = () => {
               >
                 <Icon as={FaListUl} />
               </IconButton>
-              <Text>
-                {/* {items.length} */} results
-              </Text>
+              <Text>{venues.length} results</Text>
             </Flex>
             <Flex
               gap='2'
@@ -292,8 +349,8 @@ const Venues = () => {
               mx='auto'
               justifyContent='flex-start'
             >
-              {/* {filtered.length > 0 ? (
-                filtered.map((v) => (
+              {venues.length > 0 ? (
+                venues.map((v) => (
                   <GridItem key={v.id}>
                     <GridVenueCard venue={v} />
                   </GridItem>
@@ -304,7 +361,7 @@ const Venues = () => {
                     ? 'Loading…'
                     : 'No venues available'}
                 </Text>
-              )} */}
+              )}
             </SimpleGrid>
           ) : (
             <Grid
@@ -317,8 +374,8 @@ const Venues = () => {
               mx='auto'
               justifyContent='flex-start'
             >
-              {/* {filtered.length > 0 ? (
-                filtered.map((v) => (
+              {venues.length > 0 ? (
+                venues.map((v) => (
                   <GridItem key={v.id}>
                     <ListVenueCard venue={v} />
                   </GridItem>
@@ -329,18 +386,20 @@ const Venues = () => {
                     ? 'Loading…'
                     : 'No venues available'}
                 </Text>
-              )} */}
+              )}
             </Grid>
           )}
-          {/* {!isLast && (
+          {!isLast && (
             <Button
-              onClick={handleLoadMore}
+              onClick={() =>
+                setPage((p) => p + 1)
+              }
               mt='8'
               alignSelf='center'
             >
               {loading ? 'Loading…' : 'Load more'}
             </Button>
-          )} */}
+          )}
         </Flex>
       </Flex>
     </Flex>

@@ -3,42 +3,41 @@ import {
   Button,
   Flex,
   Heading,
-  HStack,
   Image,
   Span,
   Text,
 } from '@chakra-ui/react';
 
-import { FaStar } from 'react-icons/fa';
 import { FaAngleRight } from 'react-icons/fa6';
-import type { TVenue } from '../types/venue';
 import { useNavigate } from 'react-router';
+import type { TVenue } from '../../types/venue';
 
-type VenueProps = {
-  venue: TVenue;
-};
+type ListVenueCardProps = { venue: TVenue };
 
-const GridVenueCard = ({ venue }: VenueProps) => {
+const ListVenueCard = ({
+  venue,
+}: ListVenueCardProps) => {
   const navigate = useNavigate();
   return (
     <Flex
       gap='4'
-      direction='column'
-      maxW='310px'
-      w='full'
+      direction={{ base: 'column', md: 'row' }}
       onClick={() =>
         navigate(`/venues/venue/${venue.id}`)
       }
+      cursor='pointer'
     >
       <Image
         src={
           venue.media?.[0]?.url ??
-          'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg'
+          'https://images.pexels.com/photos/28216688/pexels-photo-28216688.png'
         }
         alt={
           venue.media?.[0]?.alt ??
           'Default venue image'
         }
+        maxW='300px'
+        w='full'
         h='245px'
         rounded='md'
       />
@@ -47,10 +46,7 @@ const GridVenueCard = ({ venue }: VenueProps) => {
         justifyContent='space-between'
         w='full'
       >
-        <Flex
-          direction='column'
-          justifyContent='space-between'
-        >
+        <Flex justifyContent='space-between'>
           <Box>
             <Heading as='h2' fontFamily='body'>
               {venue.name}
@@ -59,14 +55,9 @@ const GridVenueCard = ({ venue }: VenueProps) => {
               {venue.location?.address}
             </Text>
           </Box>
-          <HStack mt='2'>
-            {[...Array(5)].map((_, i) => (
-              <FaStar key={i} />
-            ))}
-          </HStack>
         </Flex>
-        <Text fontSize='s' my='4'>
-          {venue.description}
+        <Text fontSize='s'>
+          {venue.description?.slice(0, 180)}...
         </Text>
         <Flex direction='column'>
           <Text>{venue.maxGuests} guests</Text>
@@ -90,4 +81,4 @@ const GridVenueCard = ({ venue }: VenueProps) => {
   );
 };
 
-export default GridVenueCard;
+export default ListVenueCard;

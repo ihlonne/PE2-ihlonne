@@ -40,7 +40,7 @@ const AMENITY_LABELS: Record<AmenityKey, string> =
   };
 
 const FALLBACK_IMAGE =
-  'https://images.pexels.com/photos/28216688/pexels-photo-28216688.jpeg';
+  'https://images.pexels.com/photos/28216688/pexels-photo-28216688.png';
 
 const Venue = () => {
   const { user, token } = useAuth();
