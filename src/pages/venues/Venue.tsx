@@ -129,7 +129,6 @@ const Venue = () => {
     }
   };
 
-  // Wait for venue before rendering/deriving
   if (!venue) return null;
 
   const images = (venue.media ?? []).filter(
@@ -151,6 +150,7 @@ const Venue = () => {
       px={{ base: '4', xl: 0 }}
     >
       <Flex direction='column' gap='2'>
+        {/* Hero image */}
         <Box w='full'>
           <Image
             src={hero.url}
@@ -165,6 +165,7 @@ const Venue = () => {
           />
         </Box>
 
+        {/* Thumbnails */}
         {images.length > 1 && (
           <Wrap>
             <Flex
@@ -179,9 +180,8 @@ const Venue = () => {
                   <WrapItem key={m.url || i}>
                     <Box
                       position='relative'
-                      h='120px'
-                      maxW='210px'
-                      w='100%'
+                      w='120px'
+                      aspectRatio={1} // ✅ force square thumbnails
                       onClick={() =>
                         setHeroIdx(i)
                       }
@@ -194,9 +194,9 @@ const Venue = () => {
                       <Image
                         src={m.url}
                         alt={m.alt || ''}
-                        h='full'
                         w='full'
-                        objectFit='cover'
+                        h='full'
+                        objectFit='cover' // ✅ crop to fill square
                         rounded='md'
                       />
                     </Box>
