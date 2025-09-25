@@ -162,6 +162,9 @@ const Header: React.FC = () => {
                 >
                   <Navbar
                     onLogout={handleLogout}
+                    onClose={() =>
+                      setIsProfileNavOpen(false)
+                    }
                   />
                 </Box>
               )}
