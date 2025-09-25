@@ -50,7 +50,6 @@ export const LoginForm: React.FC<
 
       try {
         const res = await loginUser(data);
-        console.log(res);
 
         localStorage.setItem(
           'token',

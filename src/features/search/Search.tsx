@@ -30,7 +30,6 @@ const Search: React.FC<SearchProps> = ({
   ) => {
     e.preventDefault();
     onSubmit(query.trim());
-    console.log('clicked');
   };
 
   return (

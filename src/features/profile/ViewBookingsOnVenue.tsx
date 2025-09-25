@@ -17,7 +17,6 @@ const ViewBookingsOnVenue = ({
   if (!bookings?.length)
     return <Text>No bookings yet</Text>;
 
-  console.log(bookings);
   return (
     <Stack gap='3'>
       {bookings.map((b) => (

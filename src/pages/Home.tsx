@@ -31,8 +31,6 @@ const Home = () => {
     []
   );
 
-  console.log(venues);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] =
     useState<unknown>(null);
