@@ -1,6 +1,4 @@
 import {
-  Avatar,
-  AvatarGroup,
   Box,
   Flex,
   GridItem,
@@ -8,6 +6,7 @@ import {
   SimpleGrid,
   Text,
   Badge,
+  Image,
 } from '@chakra-ui/react';
 import { useAuth } from '../hooks/useAuth';
 import CustomerBookingCard from '../features/profile/CustomerBookingCard';
@@ -23,6 +22,7 @@ import {
   deleteBookingForProfile,
   updateProfileMedia,
 } from '../features/profile/api';
+import { FaCamera } from 'react-icons/fa';
 
 const Profile = () => {
   const { user, token, refreshUser } = useAuth();
@@ -221,6 +221,7 @@ const Profile = () => {
             h='260px'
             rounded='lg'
           />
+          {/* Hover overlay */}
           <Box
             pos='absolute'
             inset='0'
@@ -228,12 +229,12 @@ const Profile = () => {
             alignItems='center'
             justifyContent='center'
             rounded='lg'
-            bg='blackAlpha.500'
+            bg='blackAlpha.600'
             color='white'
-            fontWeight='semibold'
+            fontSize='xs'
             opacity={0}
             transition='opacity 0.2s'
-            _groupHover={{ opacity: 1 }}
+            _hover={{ opacity: 1 }}
             cursor='pointer'
             onClick={handleChangeBanner}
             tabIndex={0}
@@ -242,7 +243,7 @@ const Profile = () => {
               handleChangeBanner()
             }
           >
-            Change banner
+            <FaCamera />
           </Box>
         </Box>
 
@@ -254,47 +255,54 @@ const Profile = () => {
         >
           <Box
             pos='relative'
-            mt='-10'
+            w='120px'
+            h='120px'
             rounded='full'
-            border='8px solid white'
-            role='group'
-            w='fit-content'
+            bg='white'
+            p='3'
+            mt='-3.5rem'
+            border='1px solid white'
           >
-            <AvatarGroup size='2xl'>
-              <Avatar.Root>
-                <Avatar.Fallback
-                  name={user?.name}
-                />
-                <Avatar.Image
-                  src={user?.avatar?.url}
-                  alt={user?.avatar?.alt}
-                />
-              </Avatar.Root>
-            </AvatarGroup>
-
+            {/* Avatar container */}
             <Box
-              pos='absolute'
-              inset='0'
+              pos='relative'
+              w='full'
+              h='full'
               rounded='full'
-              display='flex'
-              alignItems='center'
-              justifyContent='center'
-              bg='blackAlpha.600'
-              color='white'
-              fontSize='xs'
-              fontWeight='semibold'
-              opacity={0}
-              transition='opacity 0.2s'
-              _groupHover={{ opacity: 1 }}
-              cursor='pointer'
-              onClick={handleChangeAvatar}
-              tabIndex={0}
-              onKeyDown={(e) =>
-                e.key === 'Enter' &&
-                handleChangeAvatar()
-              }
+              overflow='hidden'
             >
-              Change image
+              <Image
+                src={user?.avatar?.url}
+                alt={user?.avatar?.alt}
+                w='full'
+                h='full'
+                objectFit='cover'
+              />
+
+              {/* Overlay */}
+              <Box
+                pos='absolute'
+                inset='0'
+                rounded='full'
+                display='flex'
+                alignItems='center'
+                justifyContent='center'
+                bg='blackAlpha.600'
+                color='white'
+                fontSize='sm'
+                opacity={0}
+                transition='opacity 0.2s'
+                _hover={{ opacity: 1 }}
+                cursor='pointer'
+                onClick={handleChangeAvatar}
+                tabIndex={0}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' &&
+                  handleChangeAvatar()
+                }
+              >
+                <FaCamera />
+              </Box>
             </Box>
           </Box>
 
