@@ -23,6 +23,8 @@ import {
   updateProfileMedia,
 } from '../features/profile/api';
 import { FaCamera } from 'react-icons/fa';
+import CustomModal from '../components/CustomModal';
+import ProfileMediaModal from '../features/profile/ProfileMediaModal';
 
 const Profile = () => {
   const { user, token, refreshUser } = useAuth();
@@ -37,8 +39,14 @@ const Profile = () => {
 
   const toast = toaster;
 
-  const handleChangeAvatar = async () => {
-    const url = prompt('Paste new avatar URL');
+  const [avatarModalOpen, setAvatarModalOpen] =
+    useState(false);
+  const [bannerModalOpen, setBannerModalOpen] =
+    useState(false);
+
+  const handleChangeAvatar = async (
+    url: string
+  ) => {
     if (!url || !user?.name) return;
     try {
       await updateProfileMedia(token, user.name, {
@@ -61,8 +69,9 @@ const Profile = () => {
     }
   };
 
-  const handleChangeBanner = async () => {
-    const url = prompt('Paste new banner URL');
+  const handleChangeBanner = async (
+    url: string
+  ) => {
     if (!url || !user?.name) return;
     try {
       await updateProfileMedia(token, user.name, {
@@ -236,12 +245,10 @@ const Profile = () => {
             transition='opacity 0.2s'
             _hover={{ opacity: 1 }}
             cursor='pointer'
-            onClick={handleChangeBanner}
-            tabIndex={0}
-            onKeyDown={(e) =>
-              e.key === 'Enter' &&
-              handleChangeBanner()
+            onClick={() =>
+              setBannerModalOpen(true)
             }
+            tabIndex={0}
           >
             <FaCamera />
           </Box>
@@ -294,17 +301,53 @@ const Profile = () => {
                 transition='opacity 0.2s'
                 _hover={{ opacity: 1 }}
                 cursor='pointer'
-                onClick={handleChangeAvatar}
-                tabIndex={0}
-                onKeyDown={(e) =>
-                  e.key === 'Enter' &&
-                  handleChangeAvatar()
+                onClick={() =>
+                  setAvatarModalOpen(true)
                 }
+                tabIndex={0}
               >
                 <FaCamera />
               </Box>
             </Box>
           </Box>
+
+          {/* Banner modal */}
+          <CustomModal
+            open={bannerModalOpen}
+            onClose={() =>
+              setBannerModalOpen(false)
+            }
+            title='Paste new banner URL'
+          >
+            <ProfileMediaModal
+              onCancel={() =>
+                setBannerModalOpen(false)
+              }
+              onConfirm={(url) => {
+                handleChangeBanner(url);
+                setBannerModalOpen(false);
+              }}
+            />
+          </CustomModal>
+
+          {/* Avatar modal */}
+          <CustomModal
+            open={avatarModalOpen}
+            onClose={() =>
+              setAvatarModalOpen(false)
+            }
+            title='Paste new avatar URL'
+          >
+            <ProfileMediaModal
+              onCancel={() =>
+                setAvatarModalOpen(false)
+              }
+              onConfirm={(url) => {
+                handleChangeAvatar(url);
+                setAvatarModalOpen(false);
+              }}
+            />
+          </CustomModal>
 
           <Flex
             direction='column'
