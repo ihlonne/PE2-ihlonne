@@ -16,10 +16,12 @@ import { useRef } from 'react';
 
 interface NavbarProps {
   onLogout: () => void;
+  onClose: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
   onLogout,
+  onClose,
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -49,41 +51,69 @@ const Navbar: React.FC<NavbarProps> = ({
         <Flex
           alignItems='center'
           gap='2'
-          onClick={() =>
+          onClick={() => {
             handleNavigation(
               `/profile/${user?.name}`
-            )
-          }
+            );
+            onClose();
+          }}
           cursor='pointer'
         >
           <Icon as={RiUser3Fill} />
           <Text> My Profile</Text>
         </Flex>
-        <Link to='/venues'>
-          <Flex alignItems='center' gap='2'>
-            <Icon as={FaCalendarAlt} />
-            <Text> My Bookings</Text>
-          </Flex>
-        </Link>
-        <Separator w='full' />
+        <Flex
+          alignItems='center'
+          gap='2'
+          onClick={() => {
+            handleNavigation(
+              `/profile/${user?.name}`
+            );
+            onClose();
+          }}
+          cursor='pointer'
+        >
+          <Icon as={FaCalendarAlt} />
+          <Text> My Bookings</Text>
+        </Flex>
+        <Separator
+          borderColor='brand300'
+          w='100%'
+        />
         <Link to='venues'>
-          <Flex alignItems='center' gap='2'>
+          <Flex
+            alignItems='center'
+            gap='2'
+            onClick={() => {
+              handleNavigation(`/venues`);
+              onClose();
+            }}
+            cursor='pointer'
+          >
             <Icon as={IoIosBrowsers} />
             <Text> Browse Venues</Text>
           </Flex>
         </Link>
-        <Separator w='full' />
+        <Separator
+          borderColor='brand300'
+          w='100%'
+        />
         <Flex
           cursor='pointer'
           alignItems='center'
           gap='2'
-          onClick={onLogout}
+          onClick={() => {
+            onLogout();
+            onClose();
+          }}
           onKeyDown={(e) => {
             if (
               e.key === 'Enter' ||
               e.key === ' '
-            )
+            ) {
               onLogout();
+              onClose();
+            }
           }}
         >
           <Icon as={LuLogOut} />
