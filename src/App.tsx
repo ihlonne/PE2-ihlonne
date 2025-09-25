@@ -15,7 +15,6 @@ import CreateVenue from './pages/venues/CreateVenue';
 import EditVenue from './pages/venues/EditVenue';
 import NotFound from './pages/NotFound';
 
-// 🔒 import ProtectedRoute
 import ProtectedRoute from './routes/ProtectedRoute';
 
 const App = function () {
