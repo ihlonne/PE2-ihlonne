@@ -6,6 +6,7 @@ import {
   Flex,
   Image,
   Text,
+  useMediaQuery,
 } from '@chakra-ui/react';
 
 /* import logo from '../assets/lightlogo.png'; */
@@ -41,6 +42,9 @@ const Header: React.FC = () => {
     null
   );
 
+  const [isMobile] = useMediaQuery([
+    '(min-width: 768px)',
+  ]);
   useEffect(() => {
     const handleClickOutside = (
       e: MouseEvent
@@ -98,12 +102,14 @@ const Header: React.FC = () => {
           alignItems='center'
           gap='10'
         >
-          <Box as='li' fontWeight='semibold'>
-            <Link to='/venues'>
-              {' '}
-              Browse Venues
-            </Link>
-          </Box>
+          {isMobile && (
+            <Box as='li' fontWeight='semibold'>
+              <Link to='/venues'>
+                {' '}
+                Browse Venues
+              </Link>
+            </Box>
+          )}
           {!user ? (
             <Flex alignItems='center' gap='10'>
               <Box as='li' fontWeight='semibold'>
@@ -150,7 +156,10 @@ const Header: React.FC = () => {
                 </Avatar.Root>
               </AvatarGroup>
               {isProfileNavOpen && (
-                <Box ref={menuRef}>
+                <Box
+                  position='relative'
+                  ref={menuRef}
+                >
                   <Navbar
                     onLogout={handleLogout}
                   />
