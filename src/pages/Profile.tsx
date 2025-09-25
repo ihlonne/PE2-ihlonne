@@ -142,33 +142,6 @@ const Profile = () => {
     }
   };
 
-  /* useEffect(() => {
-    if (!user?.name || !token) return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await getBookingsForProfile(
-          token,
-          user.name,
-          {
-            activeOnly: true,
-            includeVenue: true,
-          }
-        );
-        if (!cancelled) setBookings(data ?? []);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.name, token]); */
   const handleCancelBooking = async (
     id: string
   ) => {
