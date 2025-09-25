@@ -3,9 +3,9 @@ import {
   Flex,
   Image,
   Separator,
-  Text,
 } from '@chakra-ui/react';
 import logo from '../assets/logoBig.png';
+import { Link } from 'react-router';
 
 const Footer = () => {
   return (
@@ -21,74 +21,20 @@ const Footer = () => {
       bg='brand900'
       color='brand100'
     >
-      <Flex
-        direction={{ sm: 'column', lg: 'row' }}
-        justifyContent='space-between'
-        alignItems={{
-          sm: 'center',
-          lg: 'flex-start',
-        }}
-        w={{ sm: '100%', md: '65%' }}
-      >
+      <Link to='/'>
         <Box mb={{ sm: '4rem', lg: 0 }}>
           <Image src={logo} maxH='60px' />
         </Box>
+      </Link>
 
-        <Flex
-          direction={{ sm: 'column', md: 'row' }}
-          gap={{ sm: '4rem', md: '8rem' }}
-          textAlign={{ sm: 'center', md: 'left' }}
-        >
-          <Box as='ul' listStyleType='none'>
-            <Box
-              as='p'
-              fontSize='xl'
-              fontWeight='semibold'
-              mb='1.5rem'
-            >
-              Business
-            </Box>
-            <Box as='li'>About Us</Box>
-            <Box as='li'>Careers</Box>
-          </Box>
-          <Box as='ul' listStyleType='none'>
-            <Box
-              as='p'
-              fontSize='xl'
-              fontWeight='semibold'
-              mb='1.5rem'
-            >
-              Help and Information
-            </Box>
-            <Box as='li'>Customer Support</Box>
-            <Box as='li'>Contact Us</Box>
-            <Box as='li'>FAQ</Box>
-          </Box>
-          <Box as='ul' listStyleType='none'>
-            <Box
-              as='p'
-              fontSize='xl'
-              fontWeight='semibold'
-              mb='1.5rem'
-            >
-              Legal
-            </Box>
-            <Box as='li'>Privacy Policy</Box>
-            <Box as='li'>
-              Terms and Conditions
-            </Box>
-            <Box as='li'>Cookies</Box>
-          </Box>
-        </Flex>
-      </Flex>
-      <Separator
-        my='4rem 2rem'
-        color='brand300'
-        size='sm'
-        w='100%'
-      />
+      <Separator my='4rem 2rem' w='100%' />
       <Box>
-        <Text>© ihlonne</Text>
+        <Link
+          to='https://ihlonne.netlify.app'
+          target='_blank'
+        >
+          © ihlonne
+        </Link>
       </Box>
     </Flex>
   );
