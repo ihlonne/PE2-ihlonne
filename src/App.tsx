@@ -13,6 +13,7 @@ import Venues from './pages/venues/Venues';
 import Profile from './pages/Profile';
 import CreateVenue from './pages/venues/CreateVenue';
 import EditVenue from './pages/venues/EditVenue';
+import NotFound from './pages/NotFound';
 
 const App = function () {
   return (
@@ -40,6 +41,10 @@ const App = function () {
             <Route
               path='/profile/:name'
               element={<Profile />}
+            />
+            <Route
+              path='*'
+              element={<NotFound />}
             />
           </Routes>
         </Layout>
