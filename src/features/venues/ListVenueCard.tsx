@@ -56,8 +56,12 @@ const ListVenueCard = ({
             </Text>
           </Box>
         </Flex>
-        <Text fontSize='s'>
-          {venue.description?.slice(0, 180)}...
+        <Text
+          fontSize='s'
+          lineClamp={2}
+          minH='3.2em'
+        >
+          {venue.description}
         </Text>
         <Flex direction='column'>
           <Text>{venue.maxGuests} guests</Text>
