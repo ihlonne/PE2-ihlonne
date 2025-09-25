@@ -1,15 +1,17 @@
 export type AuthUser = {
+  accessToken: string;
   name: string;
   email: string;
-  avatar?: {
-    url?: string;
-    alt?: string;
-  };
-  banner?: {
-    url?: string;
-    alt?: string;
-  };
-  venueManager: boolean;
+  avatar?:
+    | { url: string; alt?: string }
+    | null
+    | undefined;
+  banner?:
+    | { url: string; alt?: string }
+    | null
+    | undefined;
+  bio?: string;
+  venueManager?: boolean;
 };
 
 export type AuthState = {

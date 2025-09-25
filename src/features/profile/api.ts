@@ -1,4 +1,5 @@
 import { api } from '../../lib';
+import type { Booking } from '../../types/booking';
 import type { TVenue } from '../../types/venue';
 
 export const updateProfileMedia = async (
@@ -24,24 +25,6 @@ export const updateProfileMedia = async (
   return data;
 };
 
-export const updateVenueManager = async (
-  name: string,
-  venueManager: boolean,
-  token: string | null
-) => {
-  return api.put(
-    `/holidaze/profiles/${encodeURIComponent(
-      name
-    )}`,
-    { venueManager },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-};
-
 export const getVenuesForProfile = async (
   username: string
 ): Promise<TVenue[]> => {
@@ -50,4 +33,36 @@ export const getVenuesForProfile = async (
     { params: { _bookings: true, _owner: true } }
   );
   return res.data.data;
+};
+
+export const getBookingsForProfile = async (
+  username: string
+): Promise<Booking[]> => {
+  const res = await api.get<{ data: Booking[] }>(
+    `/holidaze/profiles/${encodeURIComponent(
+      username
+    )}/bookings`,
+    { params: { _venue: true } }
+  );
+  return res.data.data;
+};
+
+export const deleteBookingForProfile = async (
+  token: string | null,
+  bookingId: string
+) => {
+  if (!token) throw new Error('No auth token');
+  if (!bookingId)
+    throw new Error('Missing booking ID');
+
+  await api.delete(
+    `/holidaze/bookings/${bookingId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return true;
 };

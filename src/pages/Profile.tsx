@@ -1,38 +1,33 @@
 import {
-  Avatar,
-  AvatarGroup,
   Box,
   Flex,
   GridItem,
   Heading,
   SimpleGrid,
-  Switch,
   Text,
+  Badge,
+  Image,
 } from '@chakra-ui/react';
 import { useAuth } from '../hooks/useAuth';
 import CustomerBookingCard from '../features/profile/CustomerBookingCard';
 import { useEffect, useState } from 'react';
-import {
-  deleteBooking,
-  getBookings,
-} from '../features/booking/api';
 import type { Booking } from '../types/booking';
 import { toaster } from '../components/ui/toaster';
-import {
-  getVenuesForProfile,
-  updateProfileMedia,
-  updateVenueManager,
-} from '../features/profile/api';
 import { type TVenue } from '../types/venue';
 import YourVenuesCard from '../features/profile/YourVenuesCard';
 import { deleteVenue } from '../features/venues/api';
+import {
+  getVenuesForProfile,
+  getBookingsForProfile,
+  deleteBookingForProfile,
+  updateProfileMedia,
+} from '../features/profile/api';
+import { FaCamera } from 'react-icons/fa';
+import CustomModal from '../components/CustomModal';
+import ProfileMediaModal from '../features/profile/ProfileMediaModal';
 
 const Profile = () => {
   const { user, token, refreshUser } = useAuth();
-  const [vm, setVm] = useState<boolean>(
-    !!user?.venueManager
-  );
-  const [vmSaving, setVmSaving] = useState(false);
 
   const [bookings, setBookings] = useState<
     Booking[]
@@ -40,59 +35,18 @@ const Profile = () => {
   const [venues, setVenues] = useState<TVenue[]>(
     []
   );
-
   const [loading, setLoading] = useState(false);
 
   const toast = toaster;
 
-  useEffect(() => {
-    setVm(!!user?.venueManager);
-  }, [user?.venueManager]);
+  const [avatarModalOpen, setAvatarModalOpen] =
+    useState(false);
+  const [bannerModalOpen, setBannerModalOpen] =
+    useState(false);
 
-  const onToggleVenueManager = async (e: {
-    checked: boolean;
-  }) => {
-    if (!user?.name) return;
-
-    const next = e.checked;
-    const action = next ? 'enable' : 'disable';
-
-    const ok = confirm(
-      `Are you sure you want to ${action} Venue Manager?`
-    );
-    if (!ok) return;
-
-    const prev = vm;
-    setVm(next);
-    setVmSaving(true);
-
-    try {
-      await updateVenueManager(
-        user.name,
-        next,
-        token
-      );
-      await refreshUser();
-      toast.create({
-        title: next
-          ? 'You are now a venue manager'
-          : 'Venue manager disabled',
-        type: 'success',
-      });
-    } catch (err) {
-      console.error(err);
-      setVm(prev);
-      toast.create({
-        title: 'Could not update venue manager',
-        type: 'error',
-      });
-    } finally {
-      setVmSaving(false);
-    }
-  };
-
-  const handleChangeAvatar = async () => {
-    const url = prompt('Paste new avatar URL');
+  const handleChangeAvatar = async (
+    url: string
+  ) => {
     if (!url || !user?.name) return;
     try {
       await updateProfileMedia(token, user.name, {
@@ -115,8 +69,9 @@ const Profile = () => {
     }
   };
 
-  const handleChangeBanner = async () => {
-    const url = prompt('Paste new banner URL');
+  const handleChangeBanner = async (
+    url: string
+  ) => {
     if (!url || !user?.name) return;
     try {
       await updateProfileMedia(token, user.name, {
@@ -141,17 +96,13 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user?.name) return;
+
     let cancelled = false;
     (async () => {
       try {
         setLoading(true);
-        const data = await getBookings(
-          token,
-          user.name,
-          {
-            activeOnly: true,
-            includeVenue: true,
-          }
+        const data = await getBookingsForProfile(
+          user.name
         );
         if (!cancelled) setBookings(data ?? []);
       } catch (e) {
@@ -160,10 +111,32 @@ const Profile = () => {
         if (!cancelled) setLoading(false);
       }
     })();
+
     return () => {
       cancelled = true;
     };
-  }, [token, user?.name]);
+  }, [user?.name]);
+
+  useEffect(() => {
+    if (!user?.name) return;
+
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await getVenuesForProfile(
+          user.name
+        );
+        if (!cancelled) setVenues(data ?? []);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const loadMyVenues = async () => {
     if (!user?.name) return;
@@ -178,25 +151,6 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    if (!user?.name) return;
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      try {
-        const data = await getVenuesForProfile(
-          user.name
-        );
-        if (!cancelled) setVenues(data ?? []);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.name]);
-
   const handleCancelBooking = async (
     id: string
   ) => {
@@ -206,7 +160,7 @@ const Profile = () => {
     );
 
     try {
-      await deleteBooking(token, id);
+      await deleteBookingForProfile(token, id);
       toast.create({
         title: 'Booking cancelled',
         type: 'success',
@@ -246,6 +200,10 @@ const Profile = () => {
     }
   };
 
+  if (!user || !user.name) {
+    return <Text>Loading profile…</Text>;
+  }
+
   return (
     <Flex
       direction='column'
@@ -256,6 +214,7 @@ const Profile = () => {
       mx='auto'
       gap='4rem'
     >
+      {/* Banner + Avatar */}
       <Flex direction='column' w='full'>
         <Box pos='relative' role='group'>
           <Box
@@ -271,6 +230,7 @@ const Profile = () => {
             h='260px'
             rounded='lg'
           />
+          {/* Hover overlay */}
           <Box
             pos='absolute'
             inset='0'
@@ -278,23 +238,22 @@ const Profile = () => {
             alignItems='center'
             justifyContent='center'
             rounded='lg'
-            bg='blackAlpha.500'
+            bg='blackAlpha.600'
             color='white'
-            fontWeight='semibold'
+            fontSize='xs'
             opacity={0}
             transition='opacity 0.2s'
-            _groupHover={{ opacity: 1 }}
+            _hover={{ opacity: 1 }}
             cursor='pointer'
-            onClick={handleChangeBanner}
-            tabIndex={0}
-            onKeyDown={(e) =>
-              e.key === 'Enter' &&
-              handleChangeBanner()
+            onClick={() =>
+              setBannerModalOpen(true)
             }
+            tabIndex={0}
           >
-            Change banner
+            <FaCamera />
           </Box>
         </Box>
+
         <Flex
           direction='column'
           justify='center'
@@ -303,49 +262,92 @@ const Profile = () => {
         >
           <Box
             pos='relative'
-            mt='-10'
+            w='120px'
+            h='120px'
             rounded='full'
-            border='8px solid white'
-            role='group'
-            w='fit-content'
+            bg='white'
+            p='3'
+            mt='-3.5rem'
+            border='1px solid white'
           >
-            <AvatarGroup size='2xl'>
-              <Avatar.Root>
-                <Avatar.Fallback
-                  name={user?.name}
-                />
-                <Avatar.Image
-                  src={user?.avatar?.url}
-                  alt={user?.avatar?.alt}
-                />
-              </Avatar.Root>
-            </AvatarGroup>
-
+            {/* Avatar container */}
             <Box
-              pos='absolute'
-              inset='0'
+              pos='relative'
+              w='full'
+              h='full'
               rounded='full'
-              display='flex'
-              alignItems='center'
-              justifyContent='center'
-              bg='blackAlpha.600'
-              color='white'
-              fontSize='xs'
-              fontWeight='semibold'
-              opacity={0}
-              transition='opacity 0.2s'
-              _groupHover={{ opacity: 1 }}
-              cursor='pointer'
-              onClick={handleChangeAvatar}
-              tabIndex={0}
-              onKeyDown={(e) =>
-                e.key === 'Enter' &&
-                handleChangeAvatar()
-              }
+              overflow='hidden'
             >
-              Change image
+              <Image
+                src={user?.avatar?.url}
+                alt={user?.avatar?.alt}
+                w='full'
+                h='full'
+                objectFit='cover'
+              />
+
+              {/* Overlay */}
+              <Box
+                pos='absolute'
+                inset='0'
+                rounded='full'
+                display='flex'
+                alignItems='center'
+                justifyContent='center'
+                bg='blackAlpha.600'
+                color='white'
+                fontSize='sm'
+                opacity={0}
+                transition='opacity 0.2s'
+                _hover={{ opacity: 1 }}
+                cursor='pointer'
+                onClick={() =>
+                  setAvatarModalOpen(true)
+                }
+                tabIndex={0}
+              >
+                <FaCamera />
+              </Box>
             </Box>
           </Box>
+
+          {/* Banner modal */}
+          <CustomModal
+            open={bannerModalOpen}
+            onClose={() =>
+              setBannerModalOpen(false)
+            }
+            title='Paste new banner URL'
+          >
+            <ProfileMediaModal
+              onCancel={() =>
+                setBannerModalOpen(false)
+              }
+              onConfirm={(url) => {
+                handleChangeBanner(url);
+                setBannerModalOpen(false);
+              }}
+            />
+          </CustomModal>
+
+          {/* Avatar modal */}
+          <CustomModal
+            open={avatarModalOpen}
+            onClose={() =>
+              setAvatarModalOpen(false)
+            }
+            title='Paste new avatar URL'
+          >
+            <ProfileMediaModal
+              onCancel={() =>
+                setAvatarModalOpen(false)
+              }
+              onConfirm={(url) => {
+                handleChangeAvatar(url);
+                setAvatarModalOpen(false);
+              }}
+            />
+          </CustomModal>
 
           <Flex
             direction='column'
@@ -371,28 +373,21 @@ const Profile = () => {
                   'No bio available.'}
               </Text>
             </Flex>
-            <Box>
-              <Switch.Root
-                colorPalette='cyan'
-                checked={vm}
-                onCheckedChange={(details) =>
-                  onToggleVenueManager(details)
-                }
-                disabled={vmSaving}
+
+            {/* Venue Manager Badge */}
+            {user?.venueManager && (
+              <Badge
+                colorScheme='cyan'
+                fontSize='sm'
               >
-                <Switch.HiddenInput />
-                <Switch.Label>
-                  Venue manager
-                </Switch.Label>
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-              </Switch.Root>
-            </Box>
+                Venue Manager
+              </Badge>
+            )}
           </Flex>
         </Flex>
       </Flex>
 
+      {/* Bookings */}
       <Flex direction='column' gap='2rem'>
         <Heading
           as='h1'
@@ -427,7 +422,8 @@ const Profile = () => {
         </SimpleGrid>
       </Flex>
 
-      {vm === true ? (
+      {/* Venues */}
+      {user?.venueManager && (
         <Flex direction='column' gap='2rem'>
           <Heading
             as='h1'
@@ -444,9 +440,9 @@ const Profile = () => {
               <Text>Loading Venues…</Text>
             )}
             {!loading && venues.length === 0 && (
-              <Text>No upcoming venues.</Text>
+              <Text>No venues found.</Text>
             )}
-            {venues.length > 0 ? (
+            {venues.length > 0 &&
               venues.map((venue) => (
                 <GridItem key={venue.id}>
                   <YourVenuesCard
@@ -456,13 +452,10 @@ const Profile = () => {
                     }
                   />
                 </GridItem>
-              ))
-            ) : (
-              <Text>No Venues</Text>
-            )}
+              ))}
           </SimpleGrid>
         </Flex>
-      ) : null}
+      )}
     </Flex>
   );
 };

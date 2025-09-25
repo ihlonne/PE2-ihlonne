@@ -31,8 +31,6 @@ const Home = () => {
     []
   );
 
-  console.log(venues);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] =
     useState<unknown>(null);
@@ -72,7 +70,7 @@ const Home = () => {
   };
 
   const exploreAreasMd = [
-    '1 / 1 / 5 / 5', // big tile
+    '1 / 1 / 5 / 5',
     '1 / 5 / 3 / 7',
     '3 / 5 / 5 / 7',
     '1 / 7 / 3 / 9',
@@ -110,7 +108,6 @@ const Home = () => {
     [venues]
   );
 
-  // seed once when venues arrive
   useEffect(() => {
     if (venues.length)
       setExploreVenues(
@@ -353,63 +350,64 @@ const Home = () => {
           <Grid
             templateColumns={{
               base: '1fr',
-              sm: 'repeat(2, 1fr)',
+              sm: '1fr',
               md: 'repeat(8, 1fr)',
             }}
             templateRows={{
               base: 'auto',
+              sm: 'auto',
               md: 'repeat(4, 80px)',
             }}
-            gap='1.5rem'
+            gap='1rem'
             mt='3rem'
           >
-            {loading ? (
-              <Skeleton
-                h='205px'
-                w='100%'
-                variant='shine'
-              />
-            ) : (
-              <>
-                {exploreVenues
-                  .slice(0, 5)
-                  .map((v, i) => (
-                    <GridItem
-                      key={v.id}
-                      gridArea={{
-                        base: 'auto',
-                        md: exploreAreasMd[i],
+            {exploreVenues
+              .slice(0, 5)
+              .map((v, i) => (
+                <GridItem
+                  key={v.id}
+                  gridArea={{
+                    base: 'auto',
+                    sm: 'auto',
+                    md: exploreAreasMd[i],
+                  }}
+                  minW={0}
+                >
+                  <Link
+                    to={`/venues/venue/${v.id}`}
+                  >
+                    <Box
+                      w='full'
+                      h='full'
+                      overflow='hidden'
+                      rounded='xl'
+                      aspectRatio={{
+                        base: 1,
+                        sm: 4 / 3,
+                        md: 'auto',
                       }}
-                      minW={0}
+                      _hover={{
+                        transform: 'scale(1.02)',
+                      }}
+                      transition='all 0.3s ease'
                     >
-                      <Link
-                        to={`/venues/venue/${v.id}`}
-                      >
-                        <Box
-                          w='full'
-                          h='full'
-                          overflow='hidden'
-                          rounded='xl'
-                        >
-                          <Image
-                            src={
-                              v.media?.[0]?.url ??
-                              hero
-                            }
-                            alt={
-                              v.media?.[0]?.alt ??
-                              v.name
-                            }
-                            w='full'
-                            h='full'
-                            objectFit='cover'
-                          />
-                        </Box>
-                      </Link>
-                    </GridItem>
-                  ))}
-              </>
-            )}
+                      <Image
+                        src={
+                          v.media?.[0]?.url ??
+                          hero
+                        }
+                        alt={
+                          v.media?.[0]?.alt ??
+                          v.name
+                        }
+                        w='full'
+                        h='full'
+                        objectFit='cover'
+                      />
+                    </Box>
+                  </Link>
+                </GridItem>
+              ))}
           </Grid>
 
           <HStack justifySelf='center' mt='3rem'>
