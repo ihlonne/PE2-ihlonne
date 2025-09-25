@@ -1,6 +1,6 @@
-// components/Calendar.tsx (previously AvailabilityCalendar.tsx)
 import React, { useMemo, useState } from 'react';
 import {
+  Box,
   Button,
   Flex,
   NumberInput,
@@ -16,7 +16,6 @@ import {
   startOfToday,
   differenceInCalendarDays,
 } from 'date-fns';
-import { bookingsToDisable } from '../lib/dates';
 import type { Booking } from '../types/booking';
 
 type CalendarProps = {
@@ -56,7 +55,10 @@ const Calendar: React.FC<CalendarProps> = ({
   const disabled: Matcher[] = useMemo(
     () => [
       { before: startOfToday() },
-      ...bookingsToDisable(bookings),
+      ...bookings.map((b) => ({
+        from: new Date(b.dateFrom),
+        to: new Date(b.dateTo),
+      })),
     ],
     [bookings]
   );
@@ -102,7 +104,7 @@ const Calendar: React.FC<CalendarProps> = ({
       '--rdp-disabled-text-decoration':
         'line-through',
       '--rdp-today-color': brand600,
-      '--rdp-today-weight': 'black',
+      '--rdp-today-weight': 'bold',
       '--rdp-selection-color': brand600,
       '--rdp-selection-color-start': brand600,
       '--rdp-selection-color-end': brand600,
@@ -114,7 +116,7 @@ const Calendar: React.FC<CalendarProps> = ({
   >['styles'];
 
   return (
-    <Flex direction='column' p={4} w='full'>
+    <Flex direction='column' mt='4' w='full'>
       <DayPicker
         animate
         excludeDisabled
@@ -126,6 +128,21 @@ const Calendar: React.FC<CalendarProps> = ({
         min={minNights}
         max={maxNights}
         styles={styles}
+        modifiers={{
+          booked: bookings.map((b) => ({
+            from: new Date(b.dateFrom),
+            to: new Date(b.dateTo),
+          })),
+        }}
+        modifiersStyles={{
+          booked: {
+            backgroundColor: brand200,
+            borderRadius: '4px',
+            textDecoration: 'line-through',
+            opacity: 0.8,
+          },
+        }}
+        className='custom-day-picker'
       />
       <Flex direction='column' mt={3} gap={6}>
         <Text>
@@ -160,6 +177,26 @@ const Calendar: React.FC<CalendarProps> = ({
           <Text color='fg.muted' fontSize='sm'>
             / max {maxGuests}
           </Text>
+        </Flex>
+        <Flex gap={4} mt={2}>
+          <Flex align='center' gap={1}>
+            <Box
+              w='12px'
+              h='12px'
+              bg='brand600'
+              borderRadius='2px'
+            />
+            <Text fontSize='sm'>Selected</Text>
+          </Flex>
+          <Flex align='center' gap={1}>
+            <Box
+              w='12px'
+              h='12px'
+              bg='brand200'
+              borderRadius='2px'
+            />
+            <Text fontSize='sm'>Booked</Text>
+          </Flex>
         </Flex>
 
         <Flex gap={2}>
