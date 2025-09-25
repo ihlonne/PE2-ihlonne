@@ -1,4 +1,3 @@
-// pages/venues/Venue.tsx
 import {
   Avatar,
   AvatarGroup,
@@ -23,6 +22,8 @@ import { toUtcDate } from '../../lib/dates';
 import { useAuth } from '../../hooks/useAuth';
 import { createBooking } from '../../features/booking/api';
 import type { TVenue } from '../../types/venue';
+import CustomModal from '../../components/CustomModal';
+import ConfirmBookingModal from '../../features/venues/components/ConfirmBooking';
 
 type AmenityKey = keyof TVenue['meta'];
 const AMENITY_ORDER: AmenityKey[] = [
@@ -50,6 +51,15 @@ const Venue = () => {
     useState<TVenue | null>(null);
   const [heroIdx, setHeroIdx] = useState(0);
 
+  // modal state for booking confirmation
+  const [pendingBooking, setPendingBooking] =
+    useState<{
+      from: Date;
+      to: Date;
+      nights: number;
+      guests: number;
+    } | null>(null);
+
   useEffect(() => {
     if (!id) return;
     (async () => {
@@ -70,7 +80,7 @@ const Venue = () => {
     setHeroIdx(0);
   }, [venue?.id]);
 
-  const handleRangeSelected = async ({
+  const handleRangeSelected = ({
     from,
     to,
     nights,
@@ -81,12 +91,27 @@ const Venue = () => {
     nights: number;
     guests: number;
   }) => {
-    if (!user) return;
+    if (!user) {
+      toaster.create({
+        title: 'Please log in',
+        description:
+          'You must be logged in to book.',
+        type: 'warning',
+      });
+      return;
+    }
 
-    const ok = window.confirm(
-      `Confirm booking?\n\nCheck-in: ${from.toDateString()}\nCheck-out: ${to.toDateString()}\nNights: ${nights}\nGuests: ${guests}`
-    );
-    if (!ok || !venue) return;
+    // instead of alert → open custom modal
+    setPendingBooking({
+      from,
+      to,
+      nights,
+      guests,
+    });
+  };
+
+  const confirmBooking = async () => {
+    if (!pendingBooking || !venue) return;
 
     if (!token) {
       toaster.create({
@@ -100,16 +125,19 @@ const Venue = () => {
 
     try {
       await createBooking(token, {
-        dateFrom: from.toISOString(),
-        dateTo: to.toISOString(),
-        guests,
+        dateFrom:
+          pendingBooking.from.toISOString(),
+        dateTo: pendingBooking.to.toISOString(),
+        guests: pendingBooking.guests,
         venueId: venue.id,
       });
 
       toaster.create({
         title: 'Booking confirmed',
-        description: `${nights} night${
-          nights === 1 ? '' : 's'
+        description: `${
+          pendingBooking.nights
+        } night${
+          pendingBooking.nights === 1 ? '' : 's'
         } at ${venue.name}`,
         type: 'success',
       });
@@ -126,6 +154,8 @@ const Venue = () => {
         description: message,
         type: 'error',
       });
+    } finally {
+      setPendingBooking(null);
     }
   };
 
@@ -196,7 +226,7 @@ const Venue = () => {
                         alt={m.alt || ''}
                         w='full'
                         h='full'
-                        objectFit='cover' // ✅ crop to fill square
+                        objectFit='cover'
                         rounded='md'
                       />
                     </Box>
@@ -345,6 +375,27 @@ const Venue = () => {
           </Flex>
         </Flex>
       </Flex>
+
+      {/* Booking confirmation modal */}
+      <CustomModal
+        open={!!pendingBooking}
+        onClose={() => setPendingBooking(null)}
+        title=''
+      >
+        {pendingBooking && (
+          <ConfirmBookingModal
+            from={pendingBooking.from}
+            to={pendingBooking.to}
+            nights={pendingBooking.nights}
+            guests={pendingBooking.guests}
+            venueName={venue.name}
+            onCancel={() =>
+              setPendingBooking(null)
+            }
+            onConfirm={confirmBooking}
+          />
+        )}
+      </CustomModal>
     </Flex>
   );
 };
