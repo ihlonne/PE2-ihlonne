@@ -1,8 +1,4 @@
-import {
-  Box,
-  Container,
-  Heading,
-} from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
 
 import Search from '../../features/search/Search';
 import hero from '../../assets/heroImage.jpg';
@@ -30,11 +26,15 @@ const HeroSection = () => {
         bg: 'blackAlpha.600',
       }}
     >
-      <Container
+      <Box
         position='relative'
         zIndex={1}
         textAlign='center'
+        justifyContent='center'
         color='white'
+        mx='auto'
+        maxW='1290px'
+        w={{ base: '90%', md: 'full' }}
       >
         <Heading
           as='h1'
@@ -44,19 +44,21 @@ const HeroSection = () => {
         >
           Where to next?
         </Heading>
-        <Search
-          defaultValue=''
-          onSubmit={(q) =>
-            navigate(
-              q
-                ? `/venues?q=${encodeURIComponent(
-                    q
-                  )}`
-                : `/venues`
-            )
-          }
-        />
-      </Container>
+        <Box>
+          <Search
+            defaultValue=''
+            onSubmit={(q) =>
+              navigate(
+                q
+                  ? `/venues?q=${encodeURIComponent(
+                      q
+                    )}`
+                  : `/venues`
+              )
+            }
+          />
+        </Box>
+      </Box>
     </Box>
   );
 };
