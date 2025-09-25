@@ -1,4 +1,7 @@
-import React from 'react';
+import React, {
+  useState,
+  useEffect,
+} from 'react';
 import { toaster } from '../../components/ui/toaster';
 import {
   Button,
@@ -10,10 +13,7 @@ import {
   Switch,
   Text,
 } from '@chakra-ui/react';
-import {
-  useForm,
-  type SubmitHandler,
-} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   registerSchema,
@@ -37,9 +37,8 @@ export const RegisterForm: React.FC<
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    watch,
     setValue,
+    formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     mode: 'onTouched',
@@ -52,71 +51,91 @@ export const RegisterForm: React.FC<
     },
   });
 
-  // RHF value for the switch
-  const vm = watch('venueManager');
+  // Local state for the switch (Profile-style)
+  const [vm, setVm] = useState(false);
 
-  const onValid: SubmitHandler<
-    RegisterFormValues
-  > = async (values) => {
-    const {
-      name,
-      email,
-      password,
-      venueManager,
-    } = values;
-    const data: RegisterPayload = {
-      name,
-      email,
-      password,
-      venueManager: !!venueManager,
-    };
+  // Sync local state with RHF field
+  useEffect(() => {
+    setValue('venueManager', vm, {
+      shouldValidate: true,
+    });
+  }, [vm, setValue]);
 
-    try {
-      console.log('submitted:', values);
-      const res = await registerUser(data);
-      console.log('Registered:', res);
+  const onSubmit = handleSubmit(
+    async (values: RegisterFormValues) => {
+      const {
+        name,
+        email,
+        password,
+        venueManager,
+      } = values;
+      const data: RegisterPayload = {
+        name,
+        email,
+        password,
+        venueManager: !!venueManager,
+      };
 
-      toaster.create({
-        title: 'Registration successful',
-        description: `Welcome, ${name}! Log in to fully access Holidaze.`,
-        type: 'success',
-        duration: 4000,
-      });
+      try {
+        const res = await registerUser(data);
+        console.log('Registered:', res);
 
-      onSuccess?.();
-    } catch (err: unknown) {
-      let message = 'Something went wrong';
+        toaster.create({
+          title: 'Registration successful',
+          description: `Welcome, ${name}! Log in to fully access Holidaze.`,
+          type: 'success',
+          duration: 4000,
+        });
 
-      if (axios.isAxiosError(err)) {
-        const data = err.response?.data;
+        onSuccess?.();
+      } catch (err: unknown) {
+        let message = 'Something went wrong';
 
-        if (typeof data === 'string') {
-          message = data;
-        } else if (hasErrorArray(data)) {
-          message =
-            data.errors.find(
-              (e) => typeof e.message === 'string'
-            )?.message ?? err.message;
-        } else if (hasMessage(data)) {
-          message = data.message;
-        } else {
+        if (axios.isAxiosError(err)) {
+          const data = err.response?.data;
+
+          if (typeof data === 'string') {
+            message = data;
+          } else if (hasErrorArray(data)) {
+            message =
+              data.errors.find(
+                (e) =>
+                  typeof e.message === 'string'
+              )?.message ?? err.message;
+          } else if (hasMessage(data)) {
+            message = data.message;
+          } else {
+            message = err.message;
+          }
+        } else if (err instanceof Error) {
           message = err.message;
         }
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
 
+        toaster.create({
+          title: 'Registration failed',
+          description: message,
+          type: 'error',
+          duration: 4000,
+        });
+      }
+    },
+    (errors) => {
+      console.log(
+        '❌ Validation errors:',
+        errors
+      );
       toaster.create({
-        title: 'Registration failed',
-        description: message,
+        title: 'Form validation failed',
+        description:
+          'Please check the highlighted fields.',
         type: 'error',
-        duration: 4000,
+        duration: 3000,
       });
     }
-  };
+  );
 
   return (
-    <form onSubmit={handleSubmit(onValid)}>
+    <form onSubmit={onSubmit}>
       <Stack gap='4'>
         <Field.Root invalid={!!errors.name}>
           <Field.Label>Name</Field.Label>
@@ -175,26 +194,19 @@ export const RegisterForm: React.FC<
           </Field.ErrorText>
         </Field.Root>
 
-        {/* Venue manager toggle — Chakra v3 slot API + RHF */}
+        {/* Venue manager toggle — Profile-style */}
         <Field.Root>
           <Field.Label>
             Register as a venue manager
           </Field.Label>
           <Switch.Root
-            checked={!!vm}
-            onCheckedChange={(e) =>
-              setValue(
-                'venueManager',
-                e.checked,
-                { shouldDirty: true }
-              )
-            }
             colorPalette='cyan'
+            checked={vm}
+            onCheckedChange={(details) =>
+              setVm(details.checked)
+            }
           >
-            {/* keep RHF registered via HiddenInput */}
-            <Switch.HiddenInput
-              {...register('venueManager')}
-            />
+            <Switch.HiddenInput />
             <Switch.Control>
               <Switch.Thumb />
             </Switch.Control>
