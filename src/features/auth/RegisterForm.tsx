@@ -6,12 +6,9 @@ import { toaster } from '../../components/ui/toaster';
 import {
   Button,
   Field,
-  Flex,
   Input,
-  Separator,
   Stack,
   Switch,
-  Text,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -227,13 +224,6 @@ export const RegisterForm: React.FC<
         >
           Register
         </Button>
-
-        <Separator w='100%' my='4' />
-
-        <Flex gap='2'>
-          <Text>Already got an account?</Text>
-          <Text>Sign in</Text>
-        </Flex>
       </Stack>
     </form>
   );

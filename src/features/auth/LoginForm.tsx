@@ -3,11 +3,8 @@ import { toaster } from '../../components/ui/toaster';
 import {
   Button,
   Field,
-  Flex,
   Input,
-  Separator,
   Stack,
-  Text,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -184,18 +181,13 @@ export const LoginForm: React.FC<
         </Field.Root>
 
         <Button
+          bg='brand700'
+          color='white'
           type='submit'
           disabled={isSubmitting}
         >
           Login
         </Button>
-
-        <Separator w='100%' />
-
-        <Flex gap='2'>
-          <Text>Don't have an account?</Text>
-          <Text>Register</Text>
-        </Flex>
       </Stack>
     </form>
   );
