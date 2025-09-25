@@ -6,33 +6,26 @@ import {
   GridItem,
   Heading,
   SimpleGrid,
-  Switch,
   Text,
+  Badge,
 } from '@chakra-ui/react';
 import { useAuth } from '../hooks/useAuth';
 import CustomerBookingCard from '../features/profile/CustomerBookingCard';
 import { useEffect, useState } from 'react';
-import {
-  deleteBooking,
-  getBookings,
-} from '../features/booking/api';
 import type { Booking } from '../types/booking';
 import { toaster } from '../components/ui/toaster';
-import {
-  getVenuesForProfile,
-  updateProfileMedia,
-  updateVenueManager,
-} from '../features/profile/api';
 import { type TVenue } from '../types/venue';
 import YourVenuesCard from '../features/profile/YourVenuesCard';
 import { deleteVenue } from '../features/venues/api';
+import {
+  getVenuesForProfile,
+  getBookingsForProfile,
+  deleteBookingForProfile,
+  updateProfileMedia,
+} from '../features/profile/api';
 
 const Profile = () => {
   const { user, token, refreshUser } = useAuth();
-  const [vm, setVm] = useState<boolean>(
-    !!user?.venueManager
-  );
-  const [vmSaving, setVmSaving] = useState(false);
 
   const [bookings, setBookings] = useState<
     Booking[]
@@ -40,56 +33,9 @@ const Profile = () => {
   const [venues, setVenues] = useState<TVenue[]>(
     []
   );
-
   const [loading, setLoading] = useState(false);
 
   const toast = toaster;
-
-  useEffect(() => {
-    setVm(!!user?.venueManager);
-  }, [user?.venueManager]);
-
-  const onToggleVenueManager = async (e: {
-    checked: boolean;
-  }) => {
-    if (!user?.name) return;
-
-    const next = e.checked;
-    const action = next ? 'enable' : 'disable';
-
-    const ok = confirm(
-      `Are you sure you want to ${action} Venue Manager?`
-    );
-    if (!ok) return;
-
-    const prev = vm;
-    setVm(next);
-    setVmSaving(true);
-
-    try {
-      await updateVenueManager(
-        user.name,
-        next,
-        token
-      );
-      await refreshUser();
-      toast.create({
-        title: next
-          ? 'You are now a venue manager'
-          : 'Venue manager disabled',
-        type: 'success',
-      });
-    } catch (err) {
-      console.error(err);
-      setVm(prev);
-      toast.create({
-        title: 'Could not update venue manager',
-        type: 'error',
-      });
-    } finally {
-      setVmSaving(false);
-    }
-  };
 
   const handleChangeAvatar = async () => {
     const url = prompt('Paste new avatar URL');
@@ -141,17 +87,13 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user?.name) return;
+
     let cancelled = false;
     (async () => {
       try {
         setLoading(true);
-        const data = await getBookings(
-          token,
-          user.name,
-          {
-            activeOnly: true,
-            includeVenue: true,
-          }
+        const data = await getBookingsForProfile(
+          user.name
         );
         if (!cancelled) setBookings(data ?? []);
       } catch (e) {
@@ -160,10 +102,32 @@ const Profile = () => {
         if (!cancelled) setLoading(false);
       }
     })();
+
     return () => {
       cancelled = true;
     };
-  }, [token, user?.name]);
+  }, [user?.name]);
+
+  useEffect(() => {
+    if (!user?.name) return;
+
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await getVenuesForProfile(
+          user.name
+        );
+        if (!cancelled) setVenues(data ?? []);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const loadMyVenues = async () => {
     if (!user?.name) return;
@@ -178,25 +142,33 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    if (!user?.name) return;
+  /* useEffect(() => {
+    if (!user?.name || !token) return;
+
     let cancelled = false;
     (async () => {
-      setLoading(true);
       try {
-        const data = await getVenuesForProfile(
-          user.name
+        setLoading(true);
+        const data = await getBookingsForProfile(
+          token,
+          user.name,
+          {
+            activeOnly: true,
+            includeVenue: true,
+          }
         );
-        if (!cancelled) setVenues(data ?? []);
+        if (!cancelled) setBookings(data ?? []);
+      } catch (e) {
+        console.error(e);
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
+
     return () => {
       cancelled = true;
     };
-  }, [user?.name]);
-
+  }, [user?.name, token]); */
   const handleCancelBooking = async (
     id: string
   ) => {
@@ -206,7 +178,7 @@ const Profile = () => {
     );
 
     try {
-      await deleteBooking(token, id);
+      await deleteBookingForProfile(token, id);
       toast.create({
         title: 'Booking cancelled',
         type: 'success',
@@ -246,6 +218,10 @@ const Profile = () => {
     }
   };
 
+  if (!user || !user.name) {
+    return <Text>Loading profile…</Text>;
+  }
+
   return (
     <Flex
       direction='column'
@@ -256,6 +232,7 @@ const Profile = () => {
       mx='auto'
       gap='4rem'
     >
+      {/* Banner + Avatar */}
       <Flex direction='column' w='full'>
         <Box pos='relative' role='group'>
           <Box
@@ -295,6 +272,7 @@ const Profile = () => {
             Change banner
           </Box>
         </Box>
+
         <Flex
           direction='column'
           justify='center'
@@ -371,28 +349,21 @@ const Profile = () => {
                   'No bio available.'}
               </Text>
             </Flex>
-            <Box>
-              <Switch.Root
-                colorPalette='cyan'
-                checked={vm}
-                onCheckedChange={(details) =>
-                  onToggleVenueManager(details)
-                }
-                disabled={vmSaving}
+
+            {/* Venue Manager Badge */}
+            {user?.venueManager && (
+              <Badge
+                colorScheme='cyan'
+                fontSize='sm'
               >
-                <Switch.HiddenInput />
-                <Switch.Label>
-                  Venue manager
-                </Switch.Label>
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-              </Switch.Root>
-            </Box>
+                Venue Manager
+              </Badge>
+            )}
           </Flex>
         </Flex>
       </Flex>
 
+      {/* Bookings */}
       <Flex direction='column' gap='2rem'>
         <Heading
           as='h1'
@@ -427,7 +398,8 @@ const Profile = () => {
         </SimpleGrid>
       </Flex>
 
-      {vm === true ? (
+      {/* Venues */}
+      {user?.venueManager && (
         <Flex direction='column' gap='2rem'>
           <Heading
             as='h1'
@@ -444,9 +416,9 @@ const Profile = () => {
               <Text>Loading Venues…</Text>
             )}
             {!loading && venues.length === 0 && (
-              <Text>No upcoming venues.</Text>
+              <Text>No venues found.</Text>
             )}
-            {venues.length > 0 ? (
+            {venues.length > 0 &&
               venues.map((venue) => (
                 <GridItem key={venue.id}>
                   <YourVenuesCard
@@ -456,13 +428,10 @@ const Profile = () => {
                     }
                   />
                 </GridItem>
-              ))
-            ) : (
-              <Text>No Venues</Text>
-            )}
+              ))}
           </SimpleGrid>
         </Flex>
-      ) : null}
+      )}
     </Flex>
   );
 };

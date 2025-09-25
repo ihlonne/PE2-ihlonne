@@ -26,6 +26,7 @@ const CustomerBookingCard = ({
 }: CustomerBookingCardProps) => {
   const navigate = useNavigate();
 
+  console.log(booking);
   const [
     confirmCancelOpen,
     setConfirmCancelOpen,
@@ -65,7 +66,7 @@ const CustomerBookingCard = ({
       >
         <Box>
           <Heading as='h2' fontSize='md'>
-            {booking.venue!.name}
+            {booking.venue?.name}
           </Heading>
           <Flex alignItems='center' gap='2'>
             <IoLocationSharp />

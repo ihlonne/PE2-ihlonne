@@ -23,6 +23,8 @@ import {
   hasMessage,
 } from '../../lib/errorGuards';
 import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router';
+import { api } from '../../lib';
 
 type LoginFormProps = {
   onSuccess?: () => void;
@@ -31,7 +33,9 @@ type LoginFormProps = {
 export const LoginForm: React.FC<
   LoginFormProps
 > = ({ onSuccess }) => {
-  const { saveUser } = useAuth();
+  const { saveUser, refreshUser } = useAuth();
+  const navigate = useNavigate();
+
   const {
     register: login,
     handleSubmit,
@@ -51,27 +55,40 @@ export const LoginForm: React.FC<
       };
 
       try {
+        // Step 1: login to get token
         const res = await loginUser(data);
+        const token = res.data.accessToken;
+        localStorage.setItem('token', token);
 
-        localStorage.setItem(
-          'token',
-          res.data.accessToken
+        // Step 2: fetch full profile right away
+        const profileRes = await api.get(
+          `/holidaze/profiles/${encodeURIComponent(
+            name
+          )}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
+
+        const profile = profileRes.data.data;
+        refreshUser();
+        // Step 3: save hydrated profile
         localStorage.setItem(
           'user',
-          JSON.stringify(res.data)
+          JSON.stringify(profile)
         );
-
-        saveUser(res.data);
+        saveUser(profile);
 
         toaster.create({
           title: 'Login successful',
-          description: `Welcome, ${name}! Book your next adventure, or list your venue.`,
+          description: `Welcome, ${profile.name}!`,
           type: 'success',
-          duration: 4000,
         });
 
         onSuccess?.();
+        navigate(`/profile/${profile.name}`);
       } catch (err: unknown) {
         let message = 'Something went wrong';
 
@@ -96,7 +113,7 @@ export const LoginForm: React.FC<
         }
 
         toaster.create({
-          title: 'Registration failed',
+          title: 'Login failed',
           description: message,
           type: 'error',
           duration: 4000,
@@ -149,6 +166,7 @@ export const LoginForm: React.FC<
             {errors.password?.message}
           </Field.ErrorText>
         </Field.Root>
+
         <Field.Root
           invalid={!!errors.confirmPassword}
         >
@@ -172,7 +190,7 @@ export const LoginForm: React.FC<
           Login
         </Button>
 
-        <Separator w='100&' />
+        <Separator w='100%' />
 
         <Flex gap='2'>
           <Text>Don't have an account?</Text>
