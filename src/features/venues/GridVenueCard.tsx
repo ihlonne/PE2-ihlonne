@@ -23,7 +23,7 @@ const GridVenueCard = ({ venue }: VenueProps) => {
     <Flex
       gap='4'
       direction='column'
-      maxW='310px'
+      flex='1'
       w='full'
       onClick={() =>
         navigate(`/venues/venue/${venue.id}`)
@@ -56,14 +56,18 @@ const GridVenueCard = ({ venue }: VenueProps) => {
         direction='column'
         justifyContent='space-between'
         w='full'
-        h='200px'
       >
         <Flex
           direction='column'
           justifyContent='space-between'
         >
           <Box>
-            <Heading as='h2' fontFamily='body'>
+            <Heading
+              as='h2'
+              fontFamily='body'
+              lineClamp={1}
+              minH='1.8em'
+            >
               {venue.name}
             </Heading>
             <Text fontSize='xs'>
@@ -72,12 +76,13 @@ const GridVenueCard = ({ venue }: VenueProps) => {
             </Text>
           </Box>
         </Flex>
-        <Text fontSize='s' my='4'>
-          {venue.description &&
-          venue.description.length > 80
-            ? venue.description?.slice(0, 80) +
-              '...'
-            : venue.description}
+        <Text
+          fontSize='s'
+          my='4'
+          lineClamp={2}
+          minH='3.2em'
+        >
+          {venue.description}
         </Text>
         <Flex direction='column'>
           <Text>{venue.maxGuests} guests</Text>
