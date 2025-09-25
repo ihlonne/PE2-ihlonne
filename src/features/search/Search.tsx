@@ -36,8 +36,8 @@ const Search: React.FC<SearchProps> = ({
   return (
     <chakra.form
       display='flex'
-      justifyContent='space-between'
       alignItems='center'
+      justifyContent='center'
       mt='4rem'
       role='search'
       onSubmit={handleSubmit}
@@ -45,7 +45,6 @@ const Search: React.FC<SearchProps> = ({
       <Flex
         maxW='2xl'
         w='100%'
-        justifyContent='space-between'
         alignItems='center'
         gap={{ base: 3, md: 6 }}
         bg='whiteAlpha.500'
