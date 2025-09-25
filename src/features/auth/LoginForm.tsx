@@ -22,6 +22,7 @@ import {
   hasErrorArray,
   hasMessage,
 } from '../../lib/errorGuards';
+import { useAuth } from '../../hooks/useAuth';
 
 type LoginFormProps = {
   onSuccess?: () => void;
@@ -30,6 +31,7 @@ type LoginFormProps = {
 export const LoginForm: React.FC<
   LoginFormProps
 > = ({ onSuccess }) => {
+  const { saveUser } = useAuth();
   const {
     register: login,
     handleSubmit,
@@ -59,6 +61,8 @@ export const LoginForm: React.FC<
           'user',
           JSON.stringify(res.data)
         );
+
+        saveUser(res.data);
 
         toaster.create({
           title: 'Login successful',
