@@ -4,7 +4,7 @@ import {
   Image,
   Separator,
 } from '@chakra-ui/react';
-import logo from '../assets/logoBig.png';
+import logo from '../../assets/logoBig.png';
 import { Link } from 'react-router';
 
 const Footer = () => {

@@ -1,8 +1,8 @@
 import { Box, Heading } from '@chakra-ui/react';
 
-import Search from '../../features/search/Search';
 import hero from '../../assets/heroImage.jpg';
 import { useNavigate } from 'react-router';
+import Search from '../search/Search';
 
 const HeroSection = () => {
   const navigate = useNavigate();

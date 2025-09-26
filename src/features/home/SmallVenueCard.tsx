@@ -6,7 +6,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-import type { TVenue } from '../types/venue';
+import type { TVenue } from '../../types/venue';
 import { useNavigate } from 'react-router';
 import { IoLocationSharp } from 'react-icons/io5';
 

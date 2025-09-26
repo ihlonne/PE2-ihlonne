@@ -16,7 +16,7 @@ import {
   startOfToday,
   differenceInCalendarDays,
 } from 'date-fns';
-import type { Booking } from '../types/booking';
+import type { Booking } from '../../types/booking';
 
 type CalendarProps = {
   bookings: Booking[];

@@ -9,16 +9,16 @@ import {
   useMediaQuery,
 } from '@chakra-ui/react';
 
-import logo from '../assets/darklogo.png';
+import logo from '../../assets/darklogo.png';
 import { Link, useNavigate } from 'react-router';
 import {
   useEffect,
   useRef,
   useState,
 } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import Navbar from './layout/Navbar';
-import { AuthModal } from '../features/auth/AuthModal';
+import { useAuth } from '../../hooks/useAuth';
+import Navbar from '.././layout/Navbar';
+import { AuthModal } from '../../features/auth/AuthModal';
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();

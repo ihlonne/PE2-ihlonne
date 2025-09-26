@@ -15,16 +15,16 @@ import {
 } from '@chakra-ui/react';
 
 import hero from '../assets/heroImage.jpg';
-import SmallVenueCard from '../components/SmallVenueCard';
 import type { TVenue } from '../types/venue';
 import {
   useEffect,
   useMemo,
   useState,
 } from 'react';
-import HeroSection from '../components/homePage/HeroSection';
+import HeroSection from '../features/home/HeroSection';
 import { getVenues } from '../lib/venue';
 import { Link } from 'react-router';
+import SmallVenueCard from '../features/home/SmallVenueCard';
 
 const Home = () => {
   const [venues, setVenues] = useState<TVenue[]>(
