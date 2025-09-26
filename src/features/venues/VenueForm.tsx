@@ -157,14 +157,14 @@ export default function VenueForm({
               <Field.Label>
                 Guests <Field.RequiredIndicator />
               </Field.Label>
-              <NumberInput.Root min={1} w='full'>
+              <NumberInput.Root min={0} w='full'>
                 <NumberInput.Control />
                 <NumberInput.Input
                   {...register('maxGuests', {
                     valueAsNumber: true,
                     min: {
-                      value: 1,
-                      message: '≥ 1',
+                      value: 0,
+                      message: '≥ 0',
                     },
                   })}
                 />
