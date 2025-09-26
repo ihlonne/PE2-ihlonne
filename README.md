@@ -46,8 +46,8 @@ This project was built as part of the **FED2 Project Exam** at Noroff School of 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
+git clone https://github.com/ihlonne/PE2-ihlonne
+cd PE2-ihlonne
 ```
 
 2. Install dependencies:
@@ -76,8 +76,7 @@ npm run build
 
 ## 🌍 Deployment
 
-The project is deployed here: **[Live Demo](your-deployed-link)**  
-(Replace with your Netlify/Vercel URL before submission.)
+The project is deployed here: **[Live Demo](https://pe2-ihlonne.netlify.app/)**
 
 ---
 
@@ -94,7 +93,6 @@ This project uses the official **Holidaze API**:
 - **Gantt Chart:** [Link](https://github.com/users/ihlonne/projects/8/views/4)
 - **Figma Style Guide:** [Link](https://www.figma.com/design/5r9cdotKi56ZuazED54XWK/PE2?node-id=22-251&t=apWjt2DFpIl81vap-1)
 - **Figma Prototypes (Desktop & Mobile):** [Link](https://www.figma.com/design/5r9cdotKi56ZuazED54XWK/PE2?node-id=0-1&t=apWjt2DFpIl81vap-1)
-- **Netlify:** [Link](https://pe2-ihlonne.netlify.app/)
 
 ---
 
