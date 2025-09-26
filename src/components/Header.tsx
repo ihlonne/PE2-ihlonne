@@ -121,7 +121,7 @@ const Header: React.FC = () => {
                   }}
                   cursor='pointer'
                 >
-                  List Your Venue
+                  Register
                 </Text>
               </Box>
               {/* Login shortcut */}
