@@ -26,7 +26,6 @@ const CustomerBookingCard = ({
 }: CustomerBookingCardProps) => {
   const navigate = useNavigate();
 
-  console.log(booking);
   const [
     confirmCancelOpen,
     setConfirmCancelOpen,

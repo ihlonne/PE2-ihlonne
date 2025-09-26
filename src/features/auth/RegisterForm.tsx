@@ -74,8 +74,7 @@ export const RegisterForm: React.FC<
       };
 
       try {
-        const res = await registerUser(data);
-        console.log('Registered:', res);
+        await registerUser(data);
 
         toaster.create({
           title: 'Registration successful',
@@ -116,11 +115,7 @@ export const RegisterForm: React.FC<
         });
       }
     },
-    (errors) => {
-      console.log(
-        '❌ Validation errors:',
-        errors
-      );
+    () => {
       toaster.create({
         title: 'Form validation failed',
         description:
