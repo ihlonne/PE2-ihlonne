@@ -15,7 +15,6 @@ import { useEffect, useState } from 'react';
 import { IoLocationSharp } from 'react-icons/io5';
 import { isAxiosError } from 'axios';
 
-import Calendar from '../../components/Calendar';
 import { toaster } from '../../components/ui/toaster';
 import { getVenue } from '../../lib/venue';
 import { toUtcDate } from '../../lib/dates';
@@ -23,7 +22,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { createBooking } from '../../features/booking/api';
 import type { TVenue } from '../../types/venue';
 import CustomModal from '../../components/CustomModal';
-import ConfirmBookingModal from '../../features/venues/components/ConfirmBooking';
+import ConfirmBookingModal from '../../features/booking/ConfirmBooking';
+import Calendar from '../../features/venue/Calendar';
 
 type AmenityKey = keyof TVenue['meta'];
 const AMENITY_ORDER: AmenityKey[] = [

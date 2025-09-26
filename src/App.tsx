@@ -6,7 +6,7 @@ import {
   Routes,
 } from 'react-router';
 
-import Layout from './components/Layout';
+import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Venue from './pages/venues/Venue';
 import Venues from './pages/venues/Venues';
