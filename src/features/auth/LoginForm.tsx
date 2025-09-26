@@ -20,7 +20,6 @@ import {
   hasMessage,
 } from '../../lib/errorGuards';
 import { useAuth } from '../../hooks/useAuth';
-import { useNavigate } from 'react-router';
 import { api } from '../../lib';
 
 type LoginFormProps = {
@@ -31,7 +30,6 @@ export const LoginForm: React.FC<
   LoginFormProps
 > = ({ onSuccess }) => {
   const { saveUser, refreshUser } = useAuth();
-  const navigate = useNavigate();
 
   const {
     register: login,
@@ -85,7 +83,7 @@ export const LoginForm: React.FC<
         });
 
         onSuccess?.();
-        navigate(`/profile/${profile.name}`);
+        window.location.href = `/profile/${profile.name}`;
       } catch (err: unknown) {
         let message = 'Something went wrong';
 
